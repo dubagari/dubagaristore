@@ -1,0 +1,10 @@
+
+export {default as Home} from './Home'
+export {default as Checkout} from './CkechOut'
+export {default as Login} from './Login'
+export {default as ProductDeatails} from './ProductDeatails'
+export {default as Shop} from './Shop'
+export {default as Signup} from './Signup'
+export {default as Cart} from './Cart'
+export {default as OrderSuccess} from './OrderSuccess'
+export {default as Orders} from './Orders'
