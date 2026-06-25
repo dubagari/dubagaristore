@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { authActions } from "../store/slice/authSlice";
+import { fetchCart } from "../store/slice/cartThunks";
+import { fetchWishlist } from "../store/slice/wishlistThunks";
 
 
 const Login = () => {
@@ -29,11 +31,20 @@ const Login = () => {
       const data = await res.json();
 if (data.success) {
   localStorage.setItem("userInfo", JSON.stringify(data));
+  
+  dispatch(
+    authActions.loginSuccess({
+      token: data.token,
+      user: data.user,
+    })
+  );
+  
+  dispatch(fetchCart());
+  dispatch(fetchWishlist());
       
- 
   navigate("/");
 } else {
-  data.message;
+  console.error(data.message);
 }
     } catch (error) {
       console.error(error);

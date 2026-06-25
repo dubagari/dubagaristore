@@ -1,20 +1,16 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { toast } from "react-toastify";
 
-const API_URL = `${import.meta.env.VITE_API_URL}/api/cart`;
+const API_URL = `${import.meta.env.VITE_API_URL}/api/wishlist`;
 
 const getToken = () => {
   const userInfo = JSON.parse(localStorage.getItem("userInfo"));
   return userInfo?.token || null;
 };
-// ✅ Fix: removed module-level `const token = getToken()` — it captured the token
-// at import time (before login), making all cart operations fail for fresh logins.
-// Each thunk already calls getToken() fresh, so this was both stale and unused.
 
-
-// GET CART
-export const fetchCart = createAsyncThunk(
-  "cart/fetchCart",
+// GET WISHLIST
+export const fetchWishlist = createAsyncThunk(
+  "wishlist/fetchWishlist",
   async (_, { rejectWithValue }) => {
     const token = getToken();
 
@@ -43,9 +39,9 @@ export const fetchCart = createAsyncThunk(
 );
 
 // ADD ITEM
-export const addToCart = createAsyncThunk(
-  "cart/addToCart",
-  async (item, { rejectWithValue }) => {
+export const addToWishlist = createAsyncThunk(
+  "wishlist/addToWishlist",
+  async (productId, { rejectWithValue }) => {
     try {
       const response = await fetch(API_URL, {
         method: "POST",
@@ -53,49 +49,17 @@ export const addToCart = createAsyncThunk(
           "Content-Type": "application/json",
           Authorization: `Bearer ${getToken()}`,
         },
-        body: JSON.stringify({
-          productId: item.id,
-          quantity: 1,
-        }),
+        body: JSON.stringify({ productId }),
       });
 
       const data = await response.json();
 
       if (!response.ok) {
-        toast.error(data.message || "Failed to add to cart");
+        toast.error(data.message || "Failed to add to wishlist");
         return rejectWithValue(data.message);
       }
 
-      toast.success("Product added to cart!");
-      return data;
-    } catch (error) {
-      toast.error(error.message);
-      return rejectWithValue(error.message);
-    }
-  }
-);
-
-// UPDATE QUANTITY
-export const updateCartItem = createAsyncThunk(
-  "cart/updateCartItem",
-  async ({ productId, quantity }, { rejectWithValue }) => {
-    try {
-      const response = await fetch(`${API_URL}/${productId}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${getToken()}`,
-        },
-        body: JSON.stringify({ quantity }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        toast.error(data.message || "Failed to update quantity");
-        return rejectWithValue(data.message);
-      }
-
+      toast.success("Added to Wishlist!");
       return data;
     } catch (error) {
       toast.error(error.message);
@@ -105,8 +69,8 @@ export const updateCartItem = createAsyncThunk(
 );
 
 // REMOVE ITEM
-export const removeFromCart = createAsyncThunk(
-  "cart/removeFromCart",
+export const removeFromWishlist = createAsyncThunk(
+  "wishlist/removeFromWishlist",
   async (productId, { rejectWithValue }) => {
     try {
       const response = await fetch(`${API_URL}/${productId}`, {
@@ -119,19 +83,22 @@ export const removeFromCart = createAsyncThunk(
       const data = await response.json();
 
       if (!response.ok) {
+        toast.error(data.message || "Failed to remove from wishlist");
         return rejectWithValue(data.message);
       }
 
-  return data;
+      toast.success("Removed from Wishlist");
+      return data;
     } catch (error) {
+      toast.error(error.message);
       return rejectWithValue(error.message);
     }
   }
 );
 
-// CLEAR CART
-export const clearCart = createAsyncThunk(
-  "cart/clearCart",
+// CLEAR WISHLIST
+export const clearWishlist = createAsyncThunk(
+  "wishlist/clearWishlist",
   async (_, { rejectWithValue }) => {
     try {
       const response = await fetch(API_URL, {
@@ -141,12 +108,13 @@ export const clearCart = createAsyncThunk(
         },
       });
 
+      const data = await response.json();
+
       if (!response.ok) {
-        const data = await response.json();
         return rejectWithValue(data.message);
       }
 
-      return true;
+      return data;
     } catch (error) {
       return rejectWithValue(error.message);
     }
