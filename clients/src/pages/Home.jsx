@@ -20,44 +20,65 @@ const Home = () => {
       try {
         const res = await fetch("http://localhost:5000/api/products");
         const json = await res.json();
-        if (json.success && json.data && json.data.length > 0) {
-          const dbProducts = json.data.map((p) => ({
-            id: p._id,
-            productName: p.name,
-            imgUrl: p.images?.[0] || p.image || "",
-            category: p.category || "hp",
-            price: p.price,
-            shortDesc: p.shortDesc || "No short description.",
-            description: p.description || "No full description.",
-            reviews: p.reviews || [],
-            avgRating: p.avgRating || 4.5,
-            isNewArrival: p.isNewArrival || false,
-          }));
+       if (json.success && json.data) {
+  const dbProducts = json.data.map((p) => ({
+    id: p._id,
+    productName: p.name,
+    imgUrl: p.images?.[0] || p.image || "",
+    category: p.category,
+    price: p.price,
+    shortDesc: p.shortDesc || "No short description.",
+    description: p.description || "No full description.",
+    reviews: p.reviews || [],
+    avgRating: p.avgRating || 0,
+    isNewArrival: p.isNewArrival || false,
+  }));
 
-          setHpData(dbProducts.filter((item) => item.category === "hp" || item.category === "apple"));
-          setWatchData(dbProducts.filter((item) => item.category === "watch" || item.category === "smartwatch"));
-          setLatestData(dbProducts.filter((item) => item.isNewArrival).slice(0, 8)); // Feature new arrivals
-        } else {
-          useFallback();
-        }
+  // setHpData(
+  //   dbProducts.filter(
+  //     (item) => item.category === "hp" || item.category === "apple"
+  //   )
+  // );
+
+  // setWatchData(
+  //   dbProducts.filter(
+  //     (item) =>
+  //       item.category === "watch" ||
+  //       item.category === "smartwatch"
+  //   )
+  // );
+
+  const hpProducts = dbProducts.filter(
+  (item) => item.category === "hp" || item.category === "apple"
+);
+
+const watchProducts = dbProducts.filter(
+  (item) =>
+    item.category === "watch" ||
+    item.category === "smartwatch"
+);
+
+const latestProducts = dbProducts.filter(
+  (item) => item.isNewArrival
+);
+
+setHpData(hpProducts.slice(0, 4));
+setWatchData(watchProducts.slice(0, 4));
+setLatestData(latestProducts.slice(0, 4));
+
+  setLatestData(
+    dbProducts.filter((item) => item.isNewArrival).slice(0, 8)
+  );
+}
       } catch (err) {
         console.error("Failed to load products, using fallback:", err);
-        useFallback();
+        
       } finally {
         setLoading(false);
       }
     };
 
-    const useFallback = () => {
-      setHpData(products.filter((item) => item.category === "hp"));
-      setWatchData(products.filter((item) => item.category === "watch"));
-      setLatestData(
-        products.filter(
-          (item) => item.category === "arrivals" || item.category === "headphone"
-        )
-      );
-    };
-
+   
     loadProducts();
   }, []);
 
@@ -121,13 +142,15 @@ const Home = () => {
           </div>
 
           <div className="grid grid-cols-4 gap-4">
-  {loading ? (
-    <p className="text-sm font-semibold text-slate-400 animate-pulse">
-      Loading products...
-    </p>
-  ) : (
-    <ProductList data={hpData} />
-  )}
+   {loading ? (
+  <p>Loading products...</p>
+) : hpData.length > 0 ? (
+  <ProductList data={hpData} />
+) : (
+  <p className=" self-center font-bold text-slate-400 animate-pulse py-10">
+    No products available.
+  </p>
+)}
 </div>
         </div>
       </section>
@@ -143,11 +166,15 @@ const Home = () => {
           </div>
 
           <div className="grid grid-cols-4 gap-4">
-            {loading ? (
-              <p className="text-sm font-semibold text-slate-400 animate-pulse">Loading products...</p>
-            ) : (
-              <ProductList data={watchData} />
-            )}
+        {loading ? (
+  <p>Loading products...</p>
+) : watchData.length > 0 ? (
+  <ProductList data={watchData} />
+) : (
+  <p className="text-center font-bold text-slate-400 animate-pulse py-10">
+    No products available.
+  </p>
+)}
           </div>
         </div>
       </section>
@@ -178,11 +205,15 @@ const Home = () => {
           </div>
 
           <div className="grid grid-cols-4 gap-4">
-            {loading ? (
-              <p className="text-sm font-semibold text-slate-400 animate-pulse">Loading products...</p>
-            ) : (
-              <ProductList data={latestData} />
-            )}
+           {loading ? (
+  <p>Loading products...</p>
+) : latestData.length > 0 ? (
+  <ProductList data={latestData} />
+) : (
+   <p className="text-center font-bold text-slate-400 animate-pulse py-10">
+    No products available.
+  </p>
+)}
           </div>
         </div>
       </section>

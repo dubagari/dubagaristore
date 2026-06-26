@@ -12,17 +12,25 @@ const Shop = () => {
   const [sortOrder, setSortOrder] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(true);
+  const [page, setPage] = useState(1);
+  const [pages, setPages] = useState(1);
+  const limit = 12;
 
   useEffect(() => {
     const loadProducts = async () => {
+      setLoading(true);
       try {
-        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/products`);
+        const res = await fetch(
+          `${import.meta.env.VITE_API_URL}/api/products?page=${page}&limit=${limit}`,
+        );
 
         if (!res.ok) {
-          throw new Error("Failed to fetch products from the server");
+          throw new Error("Failed to fetch products");
         }
+
         const json = await res.json();
-        if (json.success && json.data && json.data.length > 0) {
+
+        if (json.success) {
           const mapped = json.data.map((p) => ({
             _id: p._id,
             name: p.name,
@@ -30,24 +38,27 @@ const Shop = () => {
             category: p.category,
             price: p.price,
             description: p.description,
-            shortDesc: p.shortDesc || "",
+            shortDesc: p.shortDesc,
             reviews: p.reviews || [],
             avgRating: p.avgRating || 0,
           }));
+
           setDbProducts(mapped);
-          setProductData(mapped);
-        } else {
+          setPages(json.pages);
         }
       } catch (err) {
-        console.error("Failed to load products, using static fallback:", err);
+        console.error(err);
       } finally {
         setLoading(false);
       }
     };
 
     loadProducts();
-  }, []);
+  }, [page]);
 
+  useEffect(() => {
+    setPage(1);
+  }, [categoryFilter, searchTerm, sortOrder]);
   // Filter, Search, and Sort combined logic
   useEffect(() => {
     let filtered = [...dbProducts];
@@ -74,23 +85,6 @@ const Shop = () => {
 
     setProductData(filtered);
   }, [categoryFilter, sortOrder, searchTerm, dbProducts]);
-
-  // const getProductImageUrl = (product) => {
-  //   let imagePath = "";
-
-  //   if (product.images && product.images.length > 0) {
-  //     imagePath = product.images[0];
-  //   } else if (typeof product.image === "string") {
-  //     imagePath = product.image;
-  //   } else if (Array.isArray(product.image) && product.image.length > 0) {
-  //     imagePath = product.image[0];
-  //   }
-
-  //   if (!imagePath) return "https://via.placeholder.com/400";
-  //   if (imagePath.startsWith("http")) return imagePath;
-
-  //   return `${BASE_URL}${imagePath.startsWith("/") ? "" : "/"}${imagePath}`;
-  // };
 
   return (
     <div className="bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 min-h-screen pb-20 transition-colors duration-200">
@@ -167,9 +161,50 @@ const Shop = () => {
               </p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 ">
-              <Productlist data={productData} />
-            </div>
+            // <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 ">
+            //   <Productlist data={productData} />
+            // </div>
+            <>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                <Productlist data={productData} />
+              </div>
+
+              {/* Pagination */}
+              {/* Pagination */}
+              {pages > 1 && (
+                <div className="flex justify-center items-center gap-2 mt-10 flex-wrap">
+                  <button
+                    onClick={() => setPage((prev) => prev - 1)}
+                    disabled={page === 1}
+                    className="px-4 py-2 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-200 hover:bg-purple-600 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed transition"
+                  >
+                    Previous
+                  </button>
+
+                  {Array.from({ length: pages }, (_, index) => (
+                    <button
+                      key={index}
+                      onClick={() => setPage(index + 1)}
+                      className={`w-10 h-10 rounded-lg font-semibold transition ${
+                        page === index + 1
+                          ? "bg-purple-600 text-white"
+                          : "bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 hover:bg-purple-100 dark:hover:bg-slate-800"
+                      }`}
+                    >
+                      {index + 1}
+                    </button>
+                  ))}
+
+                  <button
+                    onClick={() => setPage((prev) => prev + 1)}
+                    disabled={page === pages}
+                    className="px-4 py-2 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-200 hover:bg-purple-600 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed transition"
+                  >
+                    Next
+                  </button>
+                </div>
+              )}
+            </>
           )}
         </div>
       </section>
