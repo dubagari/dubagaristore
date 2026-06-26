@@ -16,7 +16,7 @@ export default function AvatarUpload({ userId, avatar, name, onUpload }) {
 
     try {
       const res = await fetch(
-        `http://localhost:5000/api/users/upload-avatar/${userId}`,
+        `${import.meta.env.VITE_API_URL}/api/users/upload-avatar/${userId}`,
         {
           method: "POST",
           body: formData,

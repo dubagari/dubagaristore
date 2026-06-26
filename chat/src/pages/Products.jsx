@@ -80,7 +80,7 @@ const Product = () => {
       });
 
       const res = await fetch(
-        "http://localhost:5000/api/products/upload-images",
+        `${import.meta.env.VITE_API_URL}/api/products/upload-images`,
         {
           method: "POST",
           headers: {
@@ -146,12 +146,14 @@ const Product = () => {
         isNewArrival: newProduct.isNewArrival,
       };
 
-      const res = await fetch("http://localhost:5000/api/products", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
+      const res = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/products`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
         body: JSON.stringify(payload),
       });
 
