@@ -5,7 +5,7 @@ export const initializePaystackPayment = createAsyncThunk(
   async (paymentData, thunkAPI) => {
     try {
       const response = await fetch(
-        "http://localhost:5000/api/payments/initialize",
+        `${import.meta.env.VITE_API_URL}/api/payments/initialize`,
         {
           method: "POST",
           headers: {
