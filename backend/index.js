@@ -18,9 +18,7 @@ import { connectDB } from "./config/db.js";
 import Message from "./models/Message.js";
 import path from "path";
 
-// console.log("Cloud Name:", process.env.CLOUDINARY_CLOUD_NAME);
-// console.log("API Key:", process.env.CLOUDINARY_API_KEY);
-// console.log("API Secret:", process.env.CLOUDINARY_API_SECRET);
+
 
 const __dirname = path.resolve();
 
@@ -29,13 +27,27 @@ await connectDB();
 const app = express();
 
 // middleware
-const allowedOrigins = ["http://localhost:5173", "http://localhost:5174"];
-
+const allowedOrigins = [
+  "http://localhost:5173",
+  "http://localhost:5174",
+  "https://dubagaristore.vercel.app",
+];
 app.use(
   cors({
-    origin: allowedOrigins,
+    origin(origin, callback) {
+      // Allow requests with no origin (Postman, mobile apps, etc.)
+      if (!origin) return callback(null, true);
+
+      if (allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+
+      return callback(new Error("Not allowed by CORS"));
+    },
     credentials: true,
-  }),
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  })
 );
 
 app.use(express.json());
@@ -75,7 +87,7 @@ const server = createServer(app);
 const io = new Server(server, {
   cors: {
     origin: allowedOrigins,
-    methods: ["GET", "POST"],
+    methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true,
   },
 });
