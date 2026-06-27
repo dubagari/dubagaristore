@@ -19,7 +19,7 @@ const Home = () => {
   useEffect(() => {
     const loadProducts = async () => {
       try {
-        const res = await fetch(`${import.meta.env.VITE_API_URL }/api/products?limit=100`);
+        const res = await fetch(`${import.meta.env.VITE_API_URL }/api/products`);
         const json = await res.json();
         console.log(json);
 
