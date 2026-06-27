@@ -58,49 +58,99 @@ if (!allowedCategories.includes(normalizedCategory)) {
 
 
 
+// export const getProducts = asyncHandler(async (req, res) => {
+//   const page = Number(req.query.page) || 1;
+//   const limit = Number(req.query.limit) || 12;
+
+//   // Build filter object
+//   const filter = {};
+
+//   // Search
+//   if (req.query.keyword) {
+//     filter.name = {
+//       $regex: req.query.keyword,
+//       $options: "i",
+//     };
+//   }
+
+//   // Category
+//   if (req.query.category && req.query.category !== "all") {
+//     filter.category = req.query.category;
+//   }
+
+//   // Sorting
+//   let sort = { createdAt: -1 };
+
+//   if (req.query.sort === "ascending") {
+//     sort = { price: 1 };
+//   } else if (req.query.sort === "descending") {
+//     sort = { price: -1 };
+//   }
+
+//   const count = await Product.countDocuments(filter);
+
+//   const products = await Product.find(filter)
+//     .sort(sort)
+//     .skip((page - 1) * limit)
+//     .limit(limit);
+
+//   res.status(200).json({
+//     success: true,
+//     count,
+//     page,
+//     pages: Math.ceil(count / limit),
+//     data: products,
+//   });
+// });
+
+
 export const getProducts = asyncHandler(async (req, res) => {
-  const page = Number(req.query.page) || 1;
-  const limit = Number(req.query.limit) || 12;
+  try {
+    const page = Math.max(Number(req.query.page) || 1, 1);
+    const limit = Math.max(Number(req.query.limit) || 12, 1);
 
-  // Build filter object
-  const filter = {};
+    const filter = {};
 
-  // Search
-  if (req.query.keyword) {
-    filter.name = {
-      $regex: req.query.keyword,
-      $options: "i",
-    };
+    // Search
+    if (req.query.keyword?.trim()) {
+      filter.name = {
+        $regex: req.query.keyword.trim(),
+        $options: "i",
+      };
+    }
+
+    // Category
+    if (req.query.category && req.query.category !== "all") {
+      filter.category = req.query.category;
+    }
+
+    // Sorting
+    let sort = { createdAt: -1 };
+
+    if (req.query.sort === "ascending") sort = { price: 1 };
+    if (req.query.sort === "descending") sort = { price: -1 };
+
+    const count = await Product.countDocuments(filter);
+
+    const products = await Product.find(filter)
+      .sort(sort)
+      .skip((page - 1) * limit)
+      .limit(limit);
+
+    return res.status(200).json({
+      success: true,
+      count,
+      page,
+      pages: Math.ceil(count / limit),
+      data: products,
+    });
+  } catch (error) {
+    console.error("GET PRODUCTS ERROR:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Failed to fetch products",
+    });
   }
-
-  // Category
-  if (req.query.category && req.query.category !== "all") {
-    filter.category = req.query.category;
-  }
-
-  // Sorting
-  let sort = { createdAt: -1 };
-
-  if (req.query.sort === "ascending") {
-    sort = { price: 1 };
-  } else if (req.query.sort === "descending") {
-    sort = { price: -1 };
-  }
-
-  const count = await Product.countDocuments(filter);
-
-  const products = await Product.find(filter)
-    .sort(sort)
-    .skip((page - 1) * limit)
-    .limit(limit);
-
-  res.status(200).json({
-    success: true,
-    count,
-    page,
-    pages: Math.ceil(count / limit),
-    data: products,
-  });
 });
 
 export const getProduct = asyncHandler(async (req, res) => {
