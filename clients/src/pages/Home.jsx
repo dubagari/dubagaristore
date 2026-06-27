@@ -36,12 +36,11 @@ const Home = () => {
     avgRating: p.avgRating || 0,
     isNewArrival: p.isNewArrival || false,
   }));
-console.log(
-  dbProducts.map((p) => ({
-    name: p.productName,
-    category: p.category,
-  }))
-);
+console.log("Fetched:", dbProducts.length);
+console.log(dbProducts.map(p => ({
+  name: p.productName,
+  category: p.category
+})));
 
   const hpProducts = dbProducts.filter(
   (item) => item.category === "hp" || item.category === "apple"
