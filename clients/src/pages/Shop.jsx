@@ -3,11 +3,10 @@ import Shopcommon from "../UI/Shopcommon";
 import Productlist from "../UI/Productlist";
 // import { useSearchParams } from "react-router-dom";
 
-const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+const VITE_API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
 const Shop = () => {
   const [productData, setProductData] = useState([]);
-  const [dbProducts, setDbProducts] = useState([]);
   const [categoryFilter, setCategoryFilter] = useState("all");
   const [sortOrder, setSortOrder] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
@@ -19,9 +18,27 @@ const Shop = () => {
   useEffect(() => {
     const loadProducts = async () => {
       setLoading(true);
+
       try {
+        const params = new URLSearchParams();
+
+        params.append("page", page);
+        params.append("limit", limit);
+
+        if (categoryFilter !== "all") {
+          params.append("category", categoryFilter);
+        }
+
+        if (searchTerm.trim()) {
+          params.append("keyword", searchTerm);
+        }
+
+        if (sortOrder) {
+          params.append("sort", sortOrder);
+        }
+
         const res = await fetch(
-          `${import.meta.env.VITE_API_URL}/api/products?page=${page}&limit=${limit}`,
+          `${VITE_API_URL}/api/products?${params.toString()}`,
         );
 
         if (!res.ok) {
@@ -43,7 +60,7 @@ const Shop = () => {
             avgRating: p.avgRating || 0,
           }));
 
-          setDbProducts(mapped);
+          setProductData(mapped);
           setPages(json.pages);
         }
       } catch (err) {
@@ -54,37 +71,12 @@ const Shop = () => {
     };
 
     loadProducts();
-  }, [page]);
+  }, [page, categoryFilter, searchTerm, sortOrder]);
 
   useEffect(() => {
     setPage(1);
   }, [categoryFilter, searchTerm, sortOrder]);
   // Filter, Search, and Sort combined logic
-  useEffect(() => {
-    let filtered = [...dbProducts];
-
-    // Category Filter
-    if (categoryFilter !== "all" && categoryFilter !== "") {
-      filtered = filtered.filter((item) => item.category === categoryFilter);
-    }
-
-    // Search Query Filter
-    if (searchTerm.trim() !== "") {
-      filtered = filtered.filter((item) => {
-        const name = item.productName || item.name || "";
-        return name.toLowerCase().includes(searchTerm.toLowerCase());
-      });
-    }
-
-    // Pricing Sorting Filter
-    if (sortOrder === "ascending") {
-      filtered.sort((a, b) => a.price - b.price);
-    } else if (sortOrder === "descending") {
-      filtered.sort((a, b) => b.price - a.price);
-    }
-
-    setProductData(filtered);
-  }, [categoryFilter, sortOrder, searchTerm, dbProducts]);
 
   return (
     <div className="bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 min-h-screen pb-20 transition-colors duration-200">
@@ -161,15 +153,11 @@ const Shop = () => {
               </p>
             </div>
           ) : (
-            // <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 ">
-            //   <Productlist data={productData} />
-            // </div>
             <>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                 <Productlist data={productData} />
               </div>
 
-              {/* Pagination */}
               {/* Pagination */}
               {pages > 1 && (
                 <div className="flex justify-center items-center gap-2 mt-10 flex-wrap">

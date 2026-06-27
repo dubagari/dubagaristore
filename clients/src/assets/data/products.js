@@ -1480,8 +1480,9 @@ const products = [
       },
     ],
     avgRating: 4.8,
+    isNewArrival: true,
   },
-       
+        
          {
     id: "63",
     productName: "Beat EP Headphones",
@@ -1503,8 +1504,9 @@ const products = [
       },
     ],
     avgRating: 4.8,
+    isNewArrival: true,
   },
-         
+          
            {
     id: "64",
     productName: "Beat EP Headphones",
@@ -1526,9 +1528,10 @@ const products = [
       },
     ],
     avgRating: 4.8,
+    isNewArrival: true,
   },
-           
-             {
+            
+              {
     id: "65",
     productName: "Beat EP Headphones",
     imgUrl: new4,
@@ -1549,9 +1552,10 @@ const products = [
       },
     ],
     avgRating: 4.8,
+    isNewArrival: true,
   },
-             
-               {
+              
+                {
     id: "66",
     productName: "Beat EP Headphones",
     imgUrl: new5,
@@ -1572,6 +1576,7 @@ const products = [
       },
     ],
     avgRating: 4.8,
+    isNewArrival: true,
   },
                {
     id: "67",
@@ -1594,6 +1599,7 @@ const products = [
       },
     ],
     avgRating: 4.8,
+    isNewArrival: true,
   },
                {
     id: "68",
@@ -1616,6 +1622,7 @@ const products = [
       },
     ],
     avgRating: 4.8,
+    isNewArrival: true,
   },
                {
     id: "69",
@@ -1638,6 +1645,7 @@ const products = [
       },
     ],
     avgRating: 4.8,
+    isNewArrival: true,
   },
      
 ];

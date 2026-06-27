@@ -14,12 +14,15 @@ const Home = () => {
   const [watchData, setWatchData] = useState([]);
   const [latestData, setLatestData] = useState([]);
   const [loading, setLoading] = useState(true);
+  
 
   useEffect(() => {
     const loadProducts = async () => {
       try {
-        const res = await fetch("http://localhost:5000/api/products");
+        const res = await fetch(`${import.meta.env.VITE_API_URL }/api/products`);
         const json = await res.json();
+        console.log(json);
+
        if (json.success && json.data) {
   const dbProducts = json.data.map((p) => ({
     id: p._id,
@@ -33,20 +36,12 @@ const Home = () => {
     avgRating: p.avgRating || 0,
     isNewArrival: p.isNewArrival || false,
   }));
-
-  // setHpData(
-  //   dbProducts.filter(
-  //     (item) => item.category === "hp" || item.category === "apple"
-  //   )
-  // );
-
-  // setWatchData(
-  //   dbProducts.filter(
-  //     (item) =>
-  //       item.category === "watch" ||
-  //       item.category === "smartwatch"
-  //   )
-  // );
+console.log(
+  dbProducts.map((p) => ({
+    name: p.productName,
+    category: p.category,
+  }))
+);
 
   const hpProducts = dbProducts.filter(
   (item) => item.category === "hp" || item.category === "apple"
@@ -62,17 +57,43 @@ const latestProducts = dbProducts.filter(
   (item) => item.isNewArrival
 );
 
+         console.log("HP", hpProducts);
+console.log("Watch", watchProducts);
+console.log("Latest", latestProducts);
 setHpData(hpProducts.slice(0, 4));
-setWatchData(watchProducts.slice(0, 4));
-setLatestData(latestProducts.slice(0, 4));
+         setWatchData(watchProducts.slice(0, 4));
+         setLatestData(latestProducts.slice(0, 4));
 
-  setLatestData(
-    dbProducts.filter((item) => item.isNewArrival).slice(0, 8)
-  );
+
 }
       } catch (err) {
         console.error("Failed to load products, using fallback:", err);
-        
+        const dbProducts = products.map((p) => ({
+          id: p.id,
+          productName: p.productName,
+          imgUrl: p.imgUrl || "",
+          category: p.category,
+          price: p.price,
+          shortDesc: p.shortDesc || "No short description.",
+          description: p.description || "No full description.",
+          reviews: p.reviews || [],
+          avgRating: p.avgRating || 0,
+          isNewArrival: p.isNewArrival || false,
+        }));
+
+        const hpProducts = dbProducts.filter(
+          (item) => item.category === "hp" || item.category === "apple"
+        );
+        const watchProducts = dbProducts.filter(
+          (item) => item.category === "watch" || item.category === "smartwatch"
+        );
+        const latestProducts = dbProducts.filter(
+          (item) => item.isNewArrival
+        );
+
+        setHpData(hpProducts.slice(0, 4));
+        setWatchData(watchProducts.slice(0, 4));
+        setLatestData(latestProducts.slice(0, 4));
       } finally {
         setLoading(false);
       }

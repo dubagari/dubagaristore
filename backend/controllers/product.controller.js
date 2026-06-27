@@ -17,6 +17,15 @@ export const addProduct = asyncHandler(async (req, res) => {
     isNewArrival,
   } = req.body;
 
+  const normalizedCategory = category?.toLowerCase().trim();
+
+  const allowedCategories = ["hp", "apple", "watch", "smartwatch"];
+
+if (!allowedCategories.includes(normalizedCategory)) {
+  res.status(400);
+  throw new Error("Invalid category. Use hp, apple, watch, smartwatch");
+}
+
   if (
     !name ||
     !description ||
@@ -33,7 +42,7 @@ export const addProduct = asyncHandler(async (req, res) => {
     name,
     description,
     shortDesc,
-    category,
+    category: normalizedCategory,
     brand,
     price,
     stock,
@@ -48,73 +57,51 @@ export const addProduct = asyncHandler(async (req, res) => {
 });
 
 
-// export const getProducts = asyncHandler(async (req, res) => {
-//   const page = Number(req.query.page) || 1;
-//   const limit = Number(req.query.limit) || 10;
-
-//   const keyword = req.query.keyword
-//     ? {
-//         name: {
-//           $regex: req.query.keyword,
-//           $options: "i",
-//         },
-//       }
-//     : {};
-
-//   const count = await Product.countDocuments(keyword);
-
-//   const products = await Product.find(keyword)
-//     .sort({ createdAt: -1 })
-//     .skip((page - 1) * limit)
-//     .limit(limit);
-
-//   res.status(200).json({
-//     success: true,
-//     count,
-//     page,
-//     pages: Math.ceil(count / limit),
-//     data: products,
-//   });
-// });
-
-// @desc    Get single product
-// @route   GET /api/products/:id
-// @access  Public
-
 
 export const getProducts = asyncHandler(async (req, res) => {
   const page = Number(req.query.page) || 1;
-  const limit = Number(req.query.limit);
+  const limit = Number(req.query.limit) || 12;
 
-  const keyword = req.query.keyword
-    ? {
-        name: {
-          $regex: req.query.keyword,
-          $options: "i",
-        },
-      }
-    : {};
+  // Build filter object
+  const filter = {};
 
-  const count = await Product.countDocuments(keyword);
-
-  let query = Product.find(keyword).sort({ createdAt: -1 });
-
-  if (limit) {
-    query = query.skip((page - 1) * limit).limit(limit);
+  // Search
+  if (req.query.keyword) {
+    filter.name = {
+      $regex: req.query.keyword,
+      $options: "i",
+    };
   }
 
-  const products = await query;
+  // Category
+  if (req.query.category && req.query.category !== "all") {
+    filter.category = req.query.category;
+  }
+
+  // Sorting
+  let sort = { createdAt: -1 };
+
+  if (req.query.sort === "ascending") {
+    sort = { price: 1 };
+  } else if (req.query.sort === "descending") {
+    sort = { price: -1 };
+  }
+
+  const count = await Product.countDocuments(filter);
+
+  const products = await Product.find(filter)
+    .sort(sort)
+    .skip((page - 1) * limit)
+    .limit(limit);
 
   res.status(200).json({
     success: true,
     count,
-    page: limit ? page : 1,
-    pages: limit ? Math.ceil(count / limit) : 1,
+    page,
+    pages: Math.ceil(count / limit),
     data: products,
   });
 });
-
-
 
 export const getProduct = asyncHandler(async (req, res) => {
   const product = await Product.findById(req.params.id);

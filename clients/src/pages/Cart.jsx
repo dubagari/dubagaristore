@@ -105,7 +105,7 @@ const Cart = () => {
                             className="h-8 w-8 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-600 dark:bg-rose-900/20 dark:hover:bg-rose-950/30 flex items-center justify-center transition-colors mx-auto"
                             title="Remove Item"
                           >
-                           <Trash2/>
+                           <Trash2 className="h-4 w-4 cursor-pointer" />
                           </button>
                         </td>
                       </tr>

@@ -109,73 +109,7 @@ const Product = () => {
     }
   };
 
-  const handleAddProduct = async (e) => {
-    e.preventDefault();
-
-    if (
-      !newProduct.name ||
-      !newProduct.price ||
-      !newProduct.stock ||
-      !newProduct.brand ||
-      !newProduct.category ||
-      !newProduct.description ||
-      !newProduct.shortDesc
-    )
-      return;
-
-    const priceNum = parseFloat(newProduct.price);
-    const stockNum = parseInt(newProduct.stock);
-
-    let status = "In Stock";
-    if (stockNum === 0) status = "Out of Stock";
-    else if (stockNum <= 10) status = "Low Stock";
-
-    try {
-      const token = localStorage.getItem("token");
-
-      const payload = {
-        name: newProduct.name,
-        description: newProduct.description,
-        shortDesc: newProduct.shortDesc,
-        category: newProduct.category,
-        brand: newProduct.brand,
-        price: priceNum,
-        stock: stockNum,
-        status,
-        images: newProduct.images,
-        isNewArrival: newProduct.isNewArrival,
-      };
-
-      const res = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/products`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        body: JSON.stringify(payload),
-      });
-
-      // Reset form
-      setNewProduct({
-        name: "",
-        description: "",
-        shortDesc: "",
-        category: "",
-        brand: "",
-        price: "",
-        stock: "",
-        images: [],
-        isNewArrival: false,
-      });
-
-      setIsModalOpen(false);
-    } catch (error) {
-      console.error("Add product error:", error);
-    }
-  };
-
+  
   const handleSaveProduct = async (e) => {
     e.preventDefault();
 
