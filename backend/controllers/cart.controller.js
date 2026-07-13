@@ -135,8 +135,8 @@ export const removeFromCart = async (req, res) => {
     await cart.save();
 
     return res.json({
-  items: cart.items,
-});
+      items: cart.items,
+    });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

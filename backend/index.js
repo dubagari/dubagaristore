@@ -16,10 +16,10 @@ import cartRoutes from "./routes/cart.routes.js";
 import { connectDB } from "./config/db.js";
 import Message from "./models/Message.js";
 import path from "path";
+import dns from "node:dns";
 
-// console.log("Cloud Name:", process.env.CLOUDINARY_CLOUD_NAME);
-// console.log("API Key:", process.env.CLOUDINARY_API_KEY);
-// console.log("API Secret:", process.env.CLOUDINARY_API_SECRET);
+dns.setServers(["8.8.8.8", "8.8.4.4"]);
+
 
 const __dirname = path.resolve();
 

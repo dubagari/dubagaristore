@@ -99,7 +99,7 @@ export const addProduct = asyncHandler(async (req, res) => {
 // @access  Public
 export const getProducts = asyncHandler(async (req, res) => {
   const page = Number(req.query.page) || 1;
-  const limit = Number(req.query.limit) || 10;
+  const limit = req.query.limit ? Number(req.query.limit) : null;
 
   const keyword = req.query.keyword
     ? {
@@ -112,16 +112,19 @@ export const getProducts = asyncHandler(async (req, res) => {
 
   const count = await Product.countDocuments(keyword);
 
-  const products = await Product.find(keyword)
-    .sort({ createdAt: -1 })
-    .skip((page - 1) * limit)
-    .limit(limit);
+  let query = Product.find(keyword).sort({ createdAt: -1 });
+
+  if (limit) {
+    query = query.skip((page - 1) * limit).limit(limit);
+  }
+
+  const products = await query;
 
   res.status(200).json({
     success: true,
     count,
     page,
-    pages: Math.ceil(count / limit),
+    pages: limit ? Math.ceil(count / limit) : 1,
     data: products,
   });
 });
