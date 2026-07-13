@@ -13,6 +13,7 @@ import uploadRoutes from "./routes/upload.routes.js";
 import avaterRoutes from "./routes/avater.routes.js";
 import paymentRoutes from "./routes/payment.routes.js";
 import cartRoutes from "./routes/cart.routes.js";
+import wishlistRoutes from "./routes/wishlist.routes.js";
 import { connectDB } from "./config/db.js";
 import Message from "./models/Message.js";
 import path from "path";
@@ -56,6 +57,7 @@ app.use("/api/messages", messageRoutes);
 app.use("/api/upload", uploadRoutes);
 app.use("/api/users", avaterRoutes);
 app.use("/api/cart", cartRoutes);
+app.use("/api/wishlist", wishlistRoutes);
 app.use("/api/payment", paymentRoutes);
 
 // error middleware

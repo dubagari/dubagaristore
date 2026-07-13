@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { useSelector, useDispatch } from "react-redux";
+import { selectUsers } from "../../redux/slices/userSlice";
 import {
   Sun,
   Moon,
@@ -12,9 +13,12 @@ import {
   CheckCircle,
   AlertTriangle,
   Info,
+  ShoppingBag,
 } from "lucide-react";
-import { toggleDarkMode } from "../../redux/slices/navigationSlice";
-import AvatarUpload from "./AvatarUpload";
+import { toggleDarkMode, setActiveTab } from "../../redux/slices/navigationSlice";
+import { setSearchQuery as setProductSearch } from "../../redux/slices/productsSlice";
+import { setSearchQuery as setOrderSearch, setSelectedOrder } from "../../redux/slices/ordersSlice";
+
 
 export default function Navbar({ isSidebarOpen, setIsSidebarOpen }) {
   const dispatch = useDispatch();
@@ -29,42 +33,76 @@ export default function Navbar({ isSidebarOpen, setIsSidebarOpen }) {
   const adminUser =
     storedUser && storedUser !== "undefined" ? JSON.parse(storedUser) : null;
 
-  const [user, setUser] = useState(adminUser);
+  const [user] = useState(adminUser);
 
-  const name = user?.name;
-  const email = user?.email;
+  const products = useSelector((state) => state.products?.items) || [];
+  const orders = useSelector((state) => state.orders?.orders) || [];
+  const users = useSelector(selectUsers) || [];
 
-  const [notifications, setNotifications] = useState([
-    {
-      id: 1,
+  const [dismissedIds, setDismissedIds] = useState([]);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [showSearchDropdown, setShowSearchDropdown] = useState(false);
+
+  // Global Search Results
+  const searchResults = useMemo(() => {
+    if (!searchQuery.trim()) return { products: [], orders: [], users: [] };
+    const q = searchQuery.toLowerCase();
+    return {
+      products: products
+        .filter(
+          (p) =>
+            p.name?.toLowerCase().includes(q) ||
+            p.category?.toLowerCase().includes(q) ||
+            p._id?.toLowerCase().includes(q)
+        )
+        .slice(0, 3),
+      orders: orders
+        .filter(
+          (o) =>
+            o._id?.toLowerCase().includes(q) ||
+            o.user?.name?.toLowerCase().includes(q)
+        )
+        .slice(0, 3),
+      users: users
+        .filter(
+          (u) =>
+            u.name?.toLowerCase().includes(q) ||
+            u.email?.toLowerCase().includes(q) ||
+            u.role?.toLowerCase().includes(q)
+        )
+        .slice(0, 3),
+    };
+  }, [searchQuery, products, orders, users]);
+
+  // Compute live notifications dynamically
+  const notifications = [
+    // Top 3 Recent Orders
+    ...orders.slice(0, 3).map((order) => ({
+      id: `order-${order._id}`,
       title: "New order received",
-      description: "Order #3824 from Sarah Jenkins",
-      time: "5m ago",
+      description: `Order #${order._id.substring(0, 8)} for $${(order.totalAmount || order.totalPrice || 0).toFixed(2)}`,
+      time: new Date(order.createdAt).toLocaleDateString(),
       type: "success",
-      read: false,
-    },
-    {
-      id: 2,
-      title: "Low stock warning",
-      description: "Wireless Headphones is below 10 units",
-      time: "1h ago",
-      type: "warning",
-      read: false,
-    },
-    {
-      id: 3,
-      title: "System update completed",
-      description: "V2.4.0 dashboard upgrade successful",
-      time: "4h ago",
-      type: "info",
-      read: true,
-    },
-  ]);
+    })),
+    // Low Stock Products
+    ...products
+      .filter((p) => p.stock <= 10)
+      .map((p) => ({
+        id: `stock-${p._id}`,
+        title: p.stock === 0 ? "Out of stock!" : "Low stock warning",
+        description: `${p.name} is down to ${p.stock} units`,
+        time: "Just now",
+        type: p.stock === 0 ? "error" : "warning",
+      })),
+  ].map((n) => ({
+    ...n,
+    read: dismissedIds.includes(n.id),
+  }));
 
   const unreadCount = notifications.filter((n) => !n.read).length;
 
   const markAllAsRead = () => {
-    setNotifications(notifications.map((n) => ({ ...n, read: true })));
+    setDismissedIds(notifications.map((n) => n.id));
   };
 
   const getIcon = (type) => {
@@ -73,6 +111,8 @@ export default function Navbar({ isSidebarOpen, setIsSidebarOpen }) {
         return <CheckCircle className="h-5 w-5 text-emerald-500" />;
       case "warning":
         return <AlertTriangle className="h-5 w-5 text-amber-500" />;
+      case "error":
+        return <AlertTriangle className="h-5 w-5 text-rose-500" />;
       default:
         return <Info className="h-5 w-5 text-blue-500" />;
     }
@@ -103,8 +143,106 @@ export default function Navbar({ isSidebarOpen, setIsSidebarOpen }) {
           <input
             type="text"
             placeholder="Search dashboard..."
+            value={searchQuery}
+            onChange={(e) => {
+              setSearchQuery(e.target.value);
+              setShowSearchDropdown(true);
+            }}
+            onFocus={() => setShowSearchDropdown(true)}
+            onBlur={() => setTimeout(() => setShowSearchDropdown(false), 200)}
             className="h-9 w-48 rounded-full border border-slate-200 bg-slate-50 pl-9 pr-4 text-sm outline-none transition-all duration-200 focus:w-64 focus:border-purple-500 focus:bg-white dark:border-slate-800 dark:bg-slate-800 dark:text-slate-205 dark:focus:bg-slate-900 dark:focus:border-purple-400"
           />
+
+          {/* Global Search Results Dropdown */}
+          {showSearchDropdown && searchQuery.trim() && (
+            <div className="absolute top-full right-0 mt-2 w-80 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl shadow-lg ring-1 ring-black/5 p-2 max-h-[70vh] overflow-y-auto animate-fadeIn">
+              
+              {/* Products */}
+              {searchResults.products.length > 0 && (
+                <div className="mb-3">
+                  <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1 px-2">Products</h3>
+                  {searchResults.products.map(p => (
+                    <div 
+                      key={p._id} 
+                      onClick={() => {
+                        dispatch(setActiveTab("products"));
+                        dispatch(setProductSearch(p.name));
+                        setShowSearchDropdown(false);
+                      }}
+                      className="flex items-center gap-3 p-2 hover:bg-slate-50 dark:hover:bg-slate-900 rounded-lg cursor-pointer transition-colors"
+                    >
+                      <div className="h-8 w-8 rounded-md bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center shrink-0">
+                        <ShoppingBag className="h-4 w-4 text-purple-600 dark:text-purple-400" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium text-slate-800 dark:text-slate-200 truncate">{p.name}</p>
+                        <p className="text-xs text-slate-500 truncate">${(p.price || 0).toFixed(2)} • {p.category}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* Orders */}
+              {searchResults.orders.length > 0 && (
+                <div className="mb-3">
+                  <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1 px-2">Orders</h3>
+                  {searchResults.orders.map(o => (
+                    <div 
+                      key={o._id} 
+                      onClick={() => {
+                        dispatch(setActiveTab("orders"));
+                        dispatch(setSelectedOrder(o));
+                        setShowSearchDropdown(false);
+                      }}
+                      className="flex items-center gap-3 p-2 hover:bg-slate-50 dark:hover:bg-slate-900 rounded-lg cursor-pointer transition-colors"
+                    >
+                      <div className="h-8 w-8 rounded-md bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center shrink-0">
+                        <ShoppingBag className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium text-slate-800 dark:text-slate-200 truncate">#{o._id.substring(0,8)}</p>
+                        <p className="text-xs text-slate-500 truncate">{o.user?.name || "Guest"} • ${(o.totalAmount || o.totalPrice || 0).toFixed(2)}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* Users */}
+              {searchResults.users.length > 0 && (
+                <div className="mb-1">
+                  <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1 px-2">Users</h3>
+                  {searchResults.users.map(u => (
+                    <div 
+                      key={u._id} 
+                      onClick={() => {
+                        dispatch(setActiveTab("customers"));
+                        setShowSearchDropdown(false);
+                      }}
+                      className="flex items-center gap-3 p-2 hover:bg-slate-50 dark:hover:bg-slate-900 rounded-lg cursor-pointer transition-colors"
+                    >
+                      <div className="h-8 w-8 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center shrink-0">
+                        <User className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium text-slate-800 dark:text-slate-200 truncate">{u.name}</p>
+                        <p className="text-xs text-slate-500 truncate">{u.email}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* No Results */}
+              {searchResults.products.length === 0 && searchResults.orders.length === 0 && searchResults.users.length === 0 && (
+                <div className="py-6 text-center">
+                  <Search className="h-8 w-8 mx-auto text-slate-300 dark:text-slate-600 mb-2" />
+                  <p className="text-sm text-slate-500 dark:text-slate-400">No results found for "{searchQuery}"</p>
+                </div>
+              )}
+            </div>
+          )}
         </div>
 
         {/* Theme Toggle Button */}

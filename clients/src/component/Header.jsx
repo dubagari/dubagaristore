@@ -1,16 +1,57 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { data } from "./Data";
 import { Link, useNavigate } from "react-router-dom";
 import userIcon from "../assets/images/user-icon.png";
 import { useSelector, useDispatch } from "react-redux";
 import { authActions } from "../store/slice/authSlice";
+import { selectWishlistItems } from "../store/slice/wishlistSlice";
 
 const Header = () => {
   const totalQuantity = useSelector((state) => state.cart.totalQuantity);
-  const { user, isAuthenticated } = useSelector((state) => state.auth);
+  const wishlistItems = useSelector(selectWishlistItems);
+  const { user, isAuthenticated, token } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const fileInputRef = useRef(null);
+
+  const handleFileChange = async (e) => {
+    const file = e.target.files[0];
+
+    if (!file || !user?._id) return;
+
+        const formData = new FormData();
+        formData.append("avatar", file);
+
+        setLoading(true);
+
+        try {
+          const res = await fetch(
+            `http://localhost:5000/api/users/upload-avatar/${user._id}`,
+            {
+              method: "POST",
+              body: formData,
+            },
+          );
+
+          const data = await res.json();
+
+          if (!res.ok) {
+            throw new Error(data.message);
+          }
+
+          // Update React state and local storage via Redux
+          dispatch(authActions.loginSuccess({ user: data.user, token }));
+        } catch (err) {
+          console.error(err);
+        } finally {
+          setLoading(false);
+
+          // Allow selecting the same file again
+          e.target.value = "";
+        }
+      };
 
   const navigateToCart = () => {
     navigate("/cart");
@@ -54,10 +95,13 @@ const Header = () => {
           {/* Header Action Icons */}
           <div className="flex items-center gap-6">
             {/* Wishlist */}
-            <div className="relative cursor-pointer text-slate-600 hover:text-purple-600 dark:text-slate-350 dark:hover:text-purple-400 transition-colors duration-200">
-              <i className="ri-shopping-basket-fill text-2xl"></i>
-              <span className="absolute -top-1.5 -right-1.5 flex h-4.5 w-4.5 items-center justify-center rounded-full bg-purple-600 text-[10px] font-bold text-white">
-                0
+            <div 
+              onClick={() => navigate("/wishlist")}
+              className="relative cursor-pointer text-slate-600 hover:text-purple-600 dark:text-slate-350 dark:hover:text-purple-400 transition-colors duration-200"
+            >
+              <i className="ri-heart-fill text-2xl"></i>
+              <span className="absolute -top-1.5 -right-1.5 flex h-4.5 w-4.5 items-center justify-center rounded-full bg-purple-600 text-[10px] font-bold text-white animate-pulse">
+                {wishlistItems?.length || 0}
               </span>
             </div>
 
@@ -80,24 +124,56 @@ const Header = () => {
                     onClick={() => setDropdownOpen(!dropdownOpen)}
                     className="flex items-center gap-2 focus:outline-none"
                   >
-                    <div className="h-9 w-9 rounded-full bg-purple-100 dark:bg-purple-950 flex items-center justify-center border border-purple-250 dark:border-purple-800 text-purple-650 dark:text-purple-400 font-bold text-sm">
-                      {user?.name ? user.name[0].toUpperCase() : "U"}
-                    </div>
+                    <img
+                      src={
+                        user?.avatar ||
+                        `https://ui-avatars.com/api/?name=${encodeURIComponent(
+                          user?.name || "User",
+                        )}`
+                      }
+                      alt="User Avatar"
+                      className="h-10 w-10 rounded-full object-cover ring-2 ring-purple-500/20 hover:opacity-80 transition-opacity"
+                    />
                   </button>
 
                   {dropdownOpen && (
-                    <div className="absolute right-0 mt-3 w-48 origin-top-right rounded-xl border border-slate-200 bg-white p-2 shadow-lg dark:border-slate-800 dark:bg-slate-900 animate-fadeIn">
-                      <div className="px-4 py-2 border-b border-slate-100 dark:border-slate-800">
-                        <p className="text-xs font-semibold text-slate-400">
-                          Signed in as
-                        </p>
-                        <p className="text-sm font-bold text-slate-800 dark:text-white truncate">
+                    <div className="absolute right-0 mt-3 w-64 origin-top-right rounded-xl border border-slate-200 bg-white p-2 shadow-lg dark:border-slate-800 dark:bg-slate-900 animate-fadeIn">
+                      {/* Avatar Upload inside Dropdown */}
+                      <div className="flex flex-col items-center border-b border-slate-100 pb-4 pt-2 px-4 dark:border-slate-800 text-center">
+                        <img
+                          src={
+                            user?.avatar ||
+                            `https://ui-avatars.com/api/?name=${encodeURIComponent(
+                              user?.name || "User",
+                            )}`
+                          }
+                          alt="Avatar"
+                          onClick={() => !loading && fileInputRef.current?.click()}
+                          title="Click to update avatar"
+                          className={`h-16 w-16 rounded-full object-cover ring-2 ring-purple-500/20 mb-3 transition ${
+                            loading
+                              ? "opacity-50 cursor-not-allowed"
+                              : "cursor-pointer hover:scale-105 hover:ring-purple-500/50"
+                          }`}
+                        />
+                        <input
+                          ref={fileInputRef}
+                          type="file"
+                          accept="image/*"
+                          className="hidden"
+                          onChange={handleFileChange}
+                        />
+                        <h4 className="text-sm font-bold text-slate-800 dark:text-slate-100 truncate w-full">
                           {user?.name}
+                        </h4>
+                        <p className="text-xs text-slate-500 dark:text-slate-400 capitalize">
+                          {user?.role}
                         </p>
                       </div>
+
                       <button
                         onClick={handleLogout}
-                        className="w-full text-left mt-1 block px-4 py-2.5 text-sm font-semibold text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/20 rounded-lg transition-colors"
+                        className="w-full text-left mt-2 block px-4 py-2.5 text-sm font-semibold text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/20 rounded-lg transition-colors"
                       >
                         Logout
                       </button>

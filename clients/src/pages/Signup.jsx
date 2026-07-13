@@ -72,7 +72,7 @@ const Signup = () => {
             </label>
             <input
               type="text"
-              placeholder="e.g. John Doe"
+              placeholder="e.g. Abubakar Dubagari"
               value={name}
               onChange={(e) => setName(e.target.value)}
               required

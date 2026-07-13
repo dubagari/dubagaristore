@@ -18,7 +18,7 @@ const Home = () => {
   useEffect(() => {
     const loadProducts = async () => {
       try {
-        const res = await fetch("http://localhost:5000/api/products");
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/products`);
         const json = await res.json();
         if (json.success && json.data && json.data.length > 0) {
           const dbProducts = json.data.map((p) => ({

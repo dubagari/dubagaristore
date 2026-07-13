@@ -6,6 +6,7 @@ import {
   removeFromCart,
   clearCart,
 } from "./cartThunks";
+import { authActions } from "./authSlice";
 
 
 
@@ -75,12 +76,20 @@ const cartSlice = createSlice({
   setCartFromServer(state, action);
 })
 
-      // CLEAR CART
+      // CLEAR CART (API)
      .addCase(clearCart.fulfilled, (state) => {
-  state.cartItems = [];
-  state.totalQuantity = 0;
-  state.totalPrice = 0;
-})
+        state.cartItems = [];
+        state.totalQuantity = 0;
+        state.totalPrice = 0;
+      })
+
+      // CLEAR CART ON LOGOUT (Local memory wipe)
+      .addCase(authActions.logout, (state) => {
+        state.cartItems = [];
+        state.totalQuantity = 0;
+        state.totalPrice = 0;
+        state.error = null;
+      })
   },
 });
 

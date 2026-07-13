@@ -3,10 +3,12 @@ import Shopcommon from "../UI/Shopcommon";
 import { useParams } from "react-router-dom";
 import products from "../assets/data/products";
 import Productlist from "../UI/Productlist";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { addToCart } from "../store/slice/cartThunks";
-
-
+import { addToWishlist, removeFromWishlist } from "../store/slice/wishlistThunks";
+import { selectWishlistItems } from "../store/slice/wishlistSlice";
+import { toast } from "react-toastify";
+import { Heart } from "lucide-react";
 
 const ProductDeatails = () => {
   const { id } = useParams();
@@ -22,6 +24,17 @@ const ProductDeatails = () => {
   });
 
   const dispatch = useDispatch();
+  const wishlistItems = useSelector(selectWishlistItems);
+  const productId = product?.id;
+  const isInWishlist = wishlistItems?.some((w) => w.product === productId);
+
+  const toggleWishlist = () => {
+    if (isInWishlist) {
+      dispatch(removeFromWishlist(productId));
+    } else {
+      dispatch(addToWishlist(productId));
+    }
+  };
 
   useEffect(() => {
     const loadProducts = async () => {
@@ -104,7 +117,7 @@ const ProductDeatails = () => {
  const addItem = () => {
    dispatch(
      addToCart({
-       id: product.id,
+       id: productId,
      })
    );
  };
@@ -197,12 +210,23 @@ const ProductDeatails = () => {
               {shortDesc}
             </p>
 
-            <div className="pt-4 border-t border-slate-100 dark:border-slate-800">
+            <div className="pt-4 border-t border-slate-100 dark:border-slate-800 flex items-center gap-4">
               <button
                 onClick={addItem}
                 className="px-8 py-3.5 rounded-2xl bg-purple-600 hover:bg-purple-700 text-white text-sm font-bold uppercase tracking-wider shadow-lg shadow-purple-650/30 transition-all"
               >
                 Add to Cart
+              </button>
+              <button
+                onClick={toggleWishlist}
+                className={`flex h-12 w-12 items-center justify-center rounded-2xl border transition-all ${
+                  isInWishlist
+                    ? "bg-red-50 text-red-500 border-red-200 dark:bg-red-900/20 dark:border-red-900/50"
+                    : "bg-transparent text-slate-400 border-slate-200 dark:border-slate-800 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20"
+                }`}
+                title={isInWishlist ? "Remove from Wishlist" : "Add to Wishlist"}
+              >
+                <Heart className={`w-5 h-5 ${isInWishlist ? "fill-current" : ""}`} />
               </button>
             </div>
           </div>
@@ -293,7 +317,7 @@ const ProductDeatails = () => {
                     <label className="text-slate-400">Full Name</label>
                     <input
                       type="text"
-                      placeholder="e.g. John Doe"
+                      placeholder="e.g. Abubakar Dubagari"
                       name="enterName"
                       onChange={onchange}
                       value={enterName}

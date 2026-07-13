@@ -1,16 +1,29 @@
 import { Link } from "react-router-dom";
-import { Plus } from "lucide-react";
-import { useDispatch } from "react-redux";
+import { Plus, Heart } from "lucide-react";
+import { useDispatch, useSelector } from "react-redux";
 import { addToCart } from "../store/slice/cartThunks";
+import { addToWishlist, removeFromWishlist } from "../store/slice/wishlistThunks";
+import { selectWishlistItems } from "../store/slice/wishlistSlice";
 
 const ProductCart = ({ item }) => {
   const dispatch = useDispatch();
+  const wishlistItems = useSelector(selectWishlistItems);
+  const productId = item.id || item._id;
 
+  const isInWishlist = wishlistItems?.some((w) => w.product === productId);
+
+  const toggleWishlist = () => {
+    if (isInWishlist) {
+      dispatch(removeFromWishlist(productId));
+    } else {
+      dispatch(addToWishlist(productId));
+    }
+  };
   
 const addItem = () => {
   dispatch(
     addToCart({
-      id: item._id,
+      id: productId,
     })
   );
 };
@@ -30,7 +43,6 @@ const addItem = () => {
         })()
       : "https://placehold.co/400x300?text=No+Image";
 
-  const productId = item.id || item._id;
   const productName = item.productName || item.name || "Unknown Product";
   const category = item.category || "";
   const price = item.price || 0;
@@ -75,6 +87,18 @@ const addItem = () => {
           >
             Details
           </Link>
+
+          <button
+            onClick={toggleWishlist}
+            className={`flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200 dark:border-slate-800 transition-all ${
+              isInWishlist
+                ? "bg-red-50 text-red-500 border-red-200 dark:bg-red-900/20 dark:border-red-900/50"
+                : "bg-transparent text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20"
+            }`}
+            title={isInWishlist ? "Remove from Wishlist" : "Add to Wishlist"}
+          >
+            <Heart className={`w-4 h-4 ${isInWishlist ? "fill-current" : ""}`} />
+          </button>
 
           <button
             onClick={addItem}
