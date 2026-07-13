@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { LayoutDashboard, BarChart3, Package, ShoppingCart, Users, Settings, ChevronLeft, ChevronRight, Sparkles } from 'lucide-react';
 import { setActiveTab } from '../../redux/slices/navigationSlice';
@@ -6,6 +6,11 @@ import { setActiveTab } from '../../redux/slices/navigationSlice';
 export default function Sidebar({ isSidebarOpen, setIsSidebarOpen, sidebarCollapsed, setSidebarCollapsed }) {
   const dispatch = useDispatch();
   const activeTab = useSelector((state) => state.navigation.activeTab);
+  const storedUser = localStorage.getItem("adminUser");
+  const adminUser =
+      storedUser && storedUser !== "undefined" ? JSON.parse(storedUser) : null;
+  
+    const [user] = useState(adminUser);
 
   const menuItems = [
     { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
@@ -90,13 +95,13 @@ export default function Sidebar({ isSidebarOpen, setIsSidebarOpen, sidebarCollap
           <div className="border-t border-slate-900 p-4">
             <div className="flex items-center gap-3 rounded-xl bg-slate-900/60 p-3">
               <img
-                src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=100"
-                alt="Sarah Jenkins Profile"
-                className="h-9 w-9 rounded-full object-cover"
-              />
+              src={user?.avatar}
+              alt="User avatar"
+              className="h-10 w-10 rounded-full object-cover"
+            />
               <div className="flex-1 overflow-hidden">
-                <p className="text-xs font-semibold text-slate-200 truncate">Sarah Jenkins</p>
-                <p className="text-[10px] text-slate-500 font-medium truncate">Administrator</p>
+                <p className="text-xs font-semibold text-slate-200 truncate">{user?.name}</p>
+                <p className="text-[10px] text-slate-500 font-medium truncate">{user?.role}</p>
               </div>
             </div>
           </div>

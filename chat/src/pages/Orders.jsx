@@ -48,8 +48,12 @@ export default function Orders() {
   const loading = useSelector(selectOrdersLoading);
   const error = useSelector(selectOrdersError);
 
-  const handleUpdateStatus = (id, newStatus) => {
-    dispatch(updateOrderStatus({ id, status: newStatus }));
+  const handleUpdateStatus = async (id, newStatus) => {
+    try {
+      await dispatch(updateOrderStatus({ id, status: newStatus })).unwrap();
+    } catch (err) {
+      alert(err || "Failed to update order status");
+    }
   };
 
   const handleSortClick = (key) => {

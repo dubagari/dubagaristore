@@ -1,5 +1,8 @@
 import mongoose from "mongoose";
+import dns from "node:dns";
 import dotenv from "dotenv";
+
+dns.setServers(["8.8.8.8", "8.8.4.4"]);
 dotenv.config();
 
 const orderSchema = new mongoose.Schema({
@@ -18,7 +21,7 @@ async function checkOrder() {
   await mongoose.connect(process.env.MONGO_URI);
   console.log("✅ Connected\n");
 
-  const orderId = "6a3d036f1268b01ca384ace8";
+  const orderId = process.argv[2] || "6a552025c09a2dbecc4b5321";
   const order = await Order.findById(orderId).lean();
 
   if (!order) {

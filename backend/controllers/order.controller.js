@@ -112,8 +112,8 @@ export const updateOrderStatus = asyncHandler(async (req, res) => {
     throw new Error("Order not found");
   }
 
-  // Prevent unpaid Paystack orders from being processed
-  if (order.paymentMethod === "Paystack" && !order.isPaid) {
+  // Prevent unpaid Paystack orders from being processed (except cancellation)
+  if (order.paymentMethod === "Paystack" && !order.isPaid && status !== "cancelled") {
     res.status(400);
     throw new Error("Order payment has not been completed");
   }

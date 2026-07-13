@@ -1,4 +1,5 @@
 import { useRef } from "react";
+import { PaystackButton } from "react-paystack";
 
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
