@@ -34,9 +34,17 @@ const Home = () => {
             isNewArrival: p.isNewArrival || false,
           }));
 
-          setHpData(dbProducts.filter((item) => item.category === "hp" || item.category === "apple"));
-          setWatchData(dbProducts.filter((item) => item.category === "watch" || item.category === "smartwatch"));
-          setLatestData(dbProducts.filter((item) => item.isNewArrival).slice(0, 8)); // Feature new arrivals
+          setHpData(
+            dbProducts
+              .filter((item) => item.category === "hp" || item.category === "apple")
+              .slice(0, 4)
+          );
+          setWatchData(
+            dbProducts
+              .filter((item) => item.category === "watch" || item.category === "smartwatch")
+              .slice(0, 4)
+          );
+          setLatestData(dbProducts.filter((item) => item.isNewArrival).slice(0, 4)); // Feature new arrivals
         } else {
           useFallback();
         }
@@ -49,12 +57,14 @@ const Home = () => {
     };
 
     const useFallback = () => {
-      setHpData(products.filter((item) => item.category === "hp"));
-      setWatchData(products.filter((item) => item.category === "watch"));
+      setHpData(products.filter((item) => item.category === "hp").slice(0, 4));
+      setWatchData(products.filter((item) => item.category === "watch").slice(0, 4));
       setLatestData(
-        products.filter(
-          (item) => item.category === "arrivals" || item.category === "headphone"
-        )
+        products
+          .filter(
+            (item) => item.category === "arrivals" || item.category === "headphone"
+          )
+          .slice(0, 4)
       );
     };
 

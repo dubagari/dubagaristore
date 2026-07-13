@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import Shopcommon from "../UI/Shopcommon";
 import Productlist from "../UI/Productlist";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 // import { useSearchParams } from "react-router-dom";
 
 const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
@@ -12,6 +13,7 @@ const Shop = () => {
   const [sortOrder, setSortOrder] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
 
   useEffect(() => {
     const loadProducts = async () => {
@@ -73,6 +75,7 @@ const Shop = () => {
     }
 
     setProductData(filtered);
+    setCurrentPage(1);
   }, [categoryFilter, sortOrder, searchTerm, dbProducts]);
 
   // const getProductImageUrl = (product) => {
@@ -91,6 +94,13 @@ const Shop = () => {
 
   //   return `${BASE_URL}${imagePath.startsWith("/") ? "" : "/"}${imagePath}`;
   // };
+
+  const itemsPerPage = 12;
+  const totalPages = Math.ceil(productData.length / itemsPerPage);
+  const paginatedProducts = productData.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
 
   return (
     <div className="bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 min-h-screen pb-20 transition-colors duration-200">
@@ -167,8 +177,52 @@ const Shop = () => {
               </p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 ">
-              <Productlist data={productData} />
+            <div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                <Productlist data={paginatedProducts} />
+              </div>
+
+              {/* Pagination Controls */}
+              {totalPages > 1 && (
+                <div className="mt-12 flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-slate-200 dark:border-slate-800 pt-6 text-sm font-semibold text-slate-500 dark:text-slate-400">
+                  <div>
+                    Showing <span className="font-extrabold text-slate-900 dark:text-white">{(currentPage - 1) * itemsPerPage + 1}</span> to{" "}
+                    <span className="font-extrabold text-slate-900 dark:text-white">
+                      {Math.min(currentPage * itemsPerPage, productData.length)}
+                    </span>{" "}
+                    of <span className="font-extrabold text-slate-900 dark:text-white">{productData.length}</span> results
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <button
+                      onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))}
+                      disabled={currentPage === 1}
+                      className="flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200 bg-white hover:bg-slate-50 disabled:opacity-40 dark:border-slate-800 dark:bg-slate-900 dark:hover:bg-slate-800 cursor-pointer disabled:cursor-not-allowed transition-colors"
+                    >
+                      <ChevronLeft className="w-5 h-5" />
+                    </button>
+                    {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                      <button
+                        key={page}
+                        onClick={() => setCurrentPage(page)}
+                        className={`h-10 px-4 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                          currentPage === page
+                            ? "bg-purple-600 text-white shadow-md shadow-purple-650/20"
+                            : "border border-slate-200 bg-white hover:bg-slate-50 dark:border-slate-800 dark:bg-slate-900 dark:hover:bg-slate-800"
+                        }`}
+                      >
+                        {page}
+                      </button>
+                    ))}
+                    <button
+                      onClick={() => setCurrentPage((p) => Math.min(p + 1, totalPages))}
+                      disabled={currentPage === totalPages}
+                      className="flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200 bg-white hover:bg-slate-50 disabled:opacity-40 dark:border-slate-800 dark:bg-slate-900 dark:hover:bg-slate-800 cursor-pointer disabled:cursor-not-allowed transition-colors"
+                    >
+                      <ChevronRight className="w-5 h-5" />
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
           )}
         </div>
