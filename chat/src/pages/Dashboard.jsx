@@ -124,9 +124,10 @@ const Dashboard = () => {
 
   if (ordersLoading) {
     return (
-      <div className="flex items-center justify-center py-20">
+      <div className="text-center font-bold text-slate-400 animate-pulse py-10">
         Loading dashboard...
       </div>
+      
     );
   }
 

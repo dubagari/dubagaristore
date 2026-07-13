@@ -78,22 +78,7 @@ const Shop = () => {
     setCurrentPage(1);
   }, [categoryFilter, sortOrder, searchTerm, dbProducts]);
 
-  // const getProductImageUrl = (product) => {
-  //   let imagePath = "";
-
-  //   if (product.images && product.images.length > 0) {
-  //     imagePath = product.images[0];
-  //   } else if (typeof product.image === "string") {
-  //     imagePath = product.image;
-  //   } else if (Array.isArray(product.image) && product.image.length > 0) {
-  //     imagePath = product.image[0];
-  //   }
-
-  //   if (!imagePath) return "https://via.placeholder.com/400";
-  //   if (imagePath.startsWith("http")) return imagePath;
-
-  //   return `${BASE_URL}${imagePath.startsWith("/") ? "" : "/"}${imagePath}`;
-  // };
+ 
 
   const itemsPerPage = 12;
   const totalPages = Math.ceil(productData.length / itemsPerPage);
