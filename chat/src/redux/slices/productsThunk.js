@@ -1,11 +1,11 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 
-const API_URL = "http://localhost:5000/api/products";
+const API_URL = `${import.meta.env.VITE_API_URL}/api/products`;
 
 export const fetchProducts = createAsyncThunk(
   "products/fetchProducts",
   async () => {
-    const res = await fetch("http://localhost:5000/api/products");
+    const res = await fetch(API_URL);
 
     const data = await res.json();
 
@@ -13,44 +13,7 @@ export const fetchProducts = createAsyncThunk(
   },
 );
 
-// export const createProduct = createAsyncThunk(
-//   "products/createProduct",
-//   async (newProduct, thunkAPI) => {
-//     try {
-//       const token = thunkAPI.getState().auth?.user?.token;
 
-//       const formData = new FormData();
-
-//       Object.entries(newProduct).forEach(([key, value]) => {
-//         if (key === "image") {
-//           value.forEach((file) => {
-//             formData.append("images", file);
-//           });
-//         } else {
-//           formData.append(key, value);
-//         }
-//       });
-
-//       const res = await fetch(API_URL, {
-//         method: "POST",
-//         headers: {
-//           Authorization: `Bearer ${token}`,
-//         },
-//         body: formData,
-//       });
-
-//       const data = await res.json();
-
-//       if (!res.ok) {
-//         throw new Error(data.message || "Failed to create product");
-//       }
-
-//       return data;
-//     } catch (err) {
-//       return thunkAPI.rejectWithValue(err.message);
-//     }
-//   },
-// );
 
 export const createProduct = createAsyncThunk(
   "products/createProduct",
@@ -58,7 +21,7 @@ export const createProduct = createAsyncThunk(
     try {
       const token = localStorage.getItem("token");
 
-      const response = await fetch("http://localhost:5000/api/products", {
+      const response = await fetch(`${API_URL}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -85,7 +48,7 @@ export const removeProduct = createAsyncThunk(
   async (id, thunkAPI) => {
     const token = localStorage.getItem("token");
 
-    await fetch(`http://localhost:5000/api/products/${id}`, {
+    await fetch(`${API_URL}/${id}`, {
       method: "DELETE",
       headers: {
         Authorization: `Bearer ${token}`,
@@ -102,7 +65,7 @@ export const updateProduct = createAsyncThunk(
     try {
       const token = localStorage.getItem("token");
 
-      const res = await fetch(`http://localhost:5000/api/products/${id}`, {
+      const res = await fetch(`${API_URL}/${id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",

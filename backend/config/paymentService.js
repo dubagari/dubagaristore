@@ -1,6 +1,6 @@
 export const initializePayment = async (paymentData) => {
   const response = await fetch(
-    "http://localhost:5000/api/payments/initialize",
+    "import.meta/api/payments/initialize",
     {
       method: "POST",
       headers: {
@@ -15,7 +15,7 @@ export const initializePayment = async (paymentData) => {
 
 export const verifyPayment = async (reference) => {
   const response = await fetch(
-    `http://localhost:5000/api/payments/verify/${reference}`
+    `import.meta.env.VITE_API_URL/api/payments/verify/${reference}`
   );
 
   return response.json();

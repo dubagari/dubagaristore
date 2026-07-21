@@ -32,7 +32,7 @@ const ProductDeatails = () => {
       setData((prev) => ({ ...prev, enterName: user.name }));
     }
   }, [user]);
-  const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+  const BASE_URL = import.meta.env.VITE_API_URL
   const productId = product?.id;
   const isInWishlist = wishlistItems?.some((w) => w.product === productId);
 

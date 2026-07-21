@@ -14,7 +14,7 @@ const Home = () => {
   const [watchData, setWatchData] = useState([]);
   const [latestData, setLatestData] = useState([]);
   const [loading, setLoading] = useState(true);
-  const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+  const BASE_URL = import.meta.env.VITE_API_URL
 
   useEffect(() => {
     const loadProducts = async () => {

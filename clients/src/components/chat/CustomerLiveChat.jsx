@@ -3,7 +3,7 @@ import { MessageCircle, Send, X } from "lucide-react";
 import { useSelector } from "react-redux";
 import { io } from "socket.io-client";
 
-const socket = io("http://localhost:5000", {
+const socket = io(import.meta.env.VITE_API_URL, {
   transports: ["websocket"],
   reconnection: true,
 });
@@ -14,7 +14,7 @@ const CustomerLiveChat = () => {
   const [input, setInput] = useState("");
   const [connected, setConnected] = useState(false);
 
-   const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+   const BASE_URL = import.meta.env.VITE_API_URL
   const messagesEndRef = useRef(null);
   const { user } = useSelector((state) => state.auth);
 

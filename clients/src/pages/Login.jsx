@@ -10,7 +10,7 @@ const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
-   const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+   const BASE_URL = import.meta.env.VITE_API_URL
 
   const dispatch = useDispatch();
   const navigate = useNavigate();

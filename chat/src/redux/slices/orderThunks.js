@@ -5,7 +5,7 @@ export const createOrder = createAsyncThunk(
   async (orderData, thunkAPI) => {
     try {
       const token = localStorage.getItem("token");
-      const response = await fetch("http://localhost:5000/api/orders", {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/orders`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -33,7 +33,7 @@ export const fetchOrders = createAsyncThunk(
   async (_, thunkAPI) => {
     try {
       const token = localStorage.getItem("token");
-      const response = await fetch("http://localhost:5000/api/orders", {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/orders`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -59,7 +59,7 @@ export const updateOrderStatus = createAsyncThunk(
     try {
       const token = localStorage.getItem("token");
       const response = await fetch(
-        `http://localhost:5000/api/orders/${id}/status`,
+        `${import.meta.env.VITE_API_URL}/api/orders/${id}/status`,
         {
           method: "PUT",
           headers: {
