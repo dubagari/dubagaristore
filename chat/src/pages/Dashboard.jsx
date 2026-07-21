@@ -16,6 +16,7 @@ import StatCard from "../components/ui/StatCard";
 import Table from "../components/ui/Table";
 import RevenueChart from "../components/charts/RevenueChart";
 import SalesChart from "../components/charts/SalesChart";
+import LiveChatPanel from "../components/chat/LiveChatPanel";
 
 import { setActiveTab } from "../redux/slices/navigationSlice";
 import { fetchOrders } from "../redux/slices/orderThunks.js";
@@ -229,6 +230,25 @@ const Dashboard = () => {
 
         <div className="min-w-0">
           <SalesChart data={categoryChartData.length ? categoryChartData : undefined} />
+        </div>
+      </div>
+
+      {/* Live chat support */}
+      <div className="grid gap-6 xl:grid-cols-[1.2fr_0.8fr]">
+        <LiveChatPanel userName={loggedInUser?.name || "Admin"} />
+        <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+          <h3 className="text-lg font-bold text-slate-800 dark:text-slate-100">Live support status</h3>
+          <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">
+            Customers can now join the support room and exchange messages in real time.
+          </p>
+          <div className="mt-4 space-y-3">
+            <div className="rounded-xl bg-slate-50 p-3 text-sm text-slate-600 dark:bg-slate-950 dark:text-slate-300">
+              • Room: support-room
+            </div>
+            <div className="rounded-xl bg-slate-50 p-3 text-sm text-slate-600 dark:bg-slate-950 dark:text-slate-300">
+              • Messages are stored in the backend and broadcast instantly
+            </div>
+          </div>
         </div>
       </div>
 

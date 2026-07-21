@@ -28,6 +28,7 @@ const addItem = () => {
   );
 };
 
+const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
 
   // Resolve the image URL
@@ -37,7 +38,7 @@ const addItem = () => {
           const raw = item.imgUrl || item.image;
           if (!raw) return "https://placehold.co/400x300?text=No+Image";
           if (raw.startsWith("http")) return raw;
-          return `${import.meta.env.VITE_API_URL || "http://localhost:5000"}${
+          return `${BASE_URL}${
             raw.startsWith("/") ? "" : "/"
           }${raw}`;
         })()

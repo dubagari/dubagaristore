@@ -44,8 +44,8 @@ export default function Sidebar({ isSidebarOpen, setIsSidebarOpen, sidebarCollap
               <Sparkles className="h-5 w-5" />
             </div>
             {!sidebarCollapsed && (
-              <span className="text-lg font-bold text-white tracking-wide bg-gradient-to-r from-white via-purple-100 to-purple-400 bg-clip-text text-transparent">
-                Apex Dash
+              <span className="capitalize text-lg font-bold text-white tracking-wide bg-gradient-to-r from-white via-purple-100 to-purple-400 bg-clip-text text-transparent">
+                dubagari store
               </span>
             )}
           </div>

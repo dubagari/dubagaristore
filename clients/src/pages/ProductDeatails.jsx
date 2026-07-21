@@ -25,8 +25,22 @@ const ProductDeatails = () => {
 
   const dispatch = useDispatch();
   const wishlistItems = useSelector(selectWishlistItems);
+  const { token, isAuthenticated, user } = useSelector((state) => state.auth);
+
+  useEffect(() => {
+    if (user?.name) {
+      setData((prev) => ({ ...prev, enterName: user.name }));
+    }
+  }, [user]);
+  const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
   const productId = product?.id;
   const isInWishlist = wishlistItems?.some((w) => w.product === productId);
+
+  const resolveImageUrl = (raw) => {
+    if (!raw) return "https://placehold.co/400x300?text=No+Image";
+    if (raw.startsWith("http")) return raw;
+    return `${BASE_URL}${raw.startsWith("/") ? "" : "/"}${raw}`;
+  };
 
   const toggleWishlist = () => {
     if (isInWishlist) {
@@ -39,19 +53,23 @@ const ProductDeatails = () => {
   useEffect(() => {
     const loadProducts = async () => {
       try {
-        const res = await fetch("http://localhost:5000/api/products");
+        const res = await fetch(`${BASE_URL}/api/products`);
         const json = await res.json();
         if (json.success && json.data && json.data.length > 0) {
           const mapped = json.data.map((p) => ({
             id: p._id,
             productName: p.name,
-            imgUrl: p.images?.[0] || p.image || "",
+            imgUrl: resolveImageUrl(p.images?.[0] || p.image || ""),
             category: p.category || "hp",
             price: p.price,
             shortDesc: p.shortDesc || "No short description.",
             description: p.description || "No full description.",
-            reviews: p.reviews || [],
-            avgRating: p.avgRating || 4.5,
+            reviews: (p.reviews || []).map((review) => ({
+              ...review,
+              text: review.comment || review.text,
+            })),
+            avgRating: p.avgRating || 0,
+            numReviews: p.numReviews || 0,
           }));
           setAllProducts(mapped);
           const found = mapped.find((item) => item.id === id);
@@ -78,7 +96,7 @@ const ProductDeatails = () => {
     };
 
     loadProducts();
-  }, [id]);
+  }, [BASE_URL, id]);
 
   useEffect(() => {
     window.scrollTo(0, 250);
@@ -91,27 +109,56 @@ const ProductDeatails = () => {
 
   const { enterName, massage } = formdata;
 
-  const onsubmit = (e) => {
+  const onsubmit = async (e) => {
     e.preventDefault();
     if (!enterName || !massage) return;
-
-    const objectData = {
-      name: enterName,
-      masg: massage,
-      rating: str,
-    };
-
-    // Add review locally in UI
-    if (product) {
-      const updatedReviews = [
-        ...product.reviews,
-        { rating: str, text: massage },
-      ];
-      setProduct({ ...product, reviews: updatedReviews });
+    if (!isAuthenticated || !token) {
+      toast.error("Please log in to submit a review.");
+      return;
     }
 
-    setData({ enterName: "", massage: "" });
-    toast.success("Review Submitted Successfully!");
+    try {
+      const res = await fetch(`${BASE_URL}/api/products/${id}/reviews`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          name: enterName || user?.name || "Anonymous",
+          rating: Number(str),
+          comment: massage,
+        }),
+      });
+
+      const json = await res.json();
+
+      if (!res.ok) {
+        throw new Error(json.message || "Unable to submit review");
+      }
+
+      const updatedReviews = (json.data?.reviews || []).map((review) => ({
+        ...review,
+        text: review.comment || review.text,
+      }));
+
+      setProduct((prev) =>
+        prev
+          ? {
+              ...prev,
+              reviews: updatedReviews,
+              avgRating: json.data?.avgRating || prev.avgRating || 0,
+              numReviews: json.data?.numReviews || prev.numReviews || 0,
+            }
+          : prev
+      );
+
+      setData({ enterName: "", massage: "" });
+      setStr(5);
+      toast.success("Review Submitted Successfully!");
+    } catch (err) {
+      toast.error(err.message || "Unable to submit review");
+    }
   };
 
  const addItem = () => {
@@ -156,6 +203,8 @@ const ProductDeatails = () => {
     reviews,
     avgRating,
   } = product;
+  const reviewList = Array.isArray(reviews) ? reviews : [];
+  const productImage = resolveImageUrl(imgUrl);
   const relatedProduct = allProducts.filter(
     (item) => item.category === category && item.id !== id,
   );
@@ -168,9 +217,9 @@ const ProductDeatails = () => {
         {/* Main Details Panel */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           {/* Left: Product Image Box */}
-          <div className="h-96 md:h-[450px] bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-[2.5rem] flex items-center justify-center p-8 shadow-sm">
+          <div className="h-96 md:h-[28rem] bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-[2.5rem] flex items-center justify-center p-8 shadow-sm">
             <img
-              src={imgUrl}
+              src={productImage}
               alt={productName}
               className="max-h-full max-w-full object-contain"
             />
@@ -256,7 +305,7 @@ const ProductDeatails = () => {
                   : "text-slate-400 hover:text-slate-600"
               }`}
             >
-              Reviews ({reviews.length})
+              Reviews ({reviewList.length})
               {tab === "rev" && (
                 <span className="absolute bottom-0 left-0 w-full h-0.5 bg-purple-600"></span>
               )}
@@ -273,29 +322,37 @@ const ProductDeatails = () => {
           ) : (
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
               {/* Reviews History */}
-              <div className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-3xl p-6 shadow-sm space-y-4 max-h-[400px] overflow-y-auto">
+              <div className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-3xl p-6 shadow-sm space-y-4 max-h-100 overflow-y-auto">
                 <h4 className="text-sm font-bold text-slate-800 dark:text-white border-b border-slate-50 dark:border-slate-800 pb-3">
                   Customer Comments
                 </h4>
-                {reviews.length === 0 ? (
+                {reviewList.length === 0 ? (
                   <p className="text-xs font-semibold text-slate-400">
                     No reviews yet. Be the first to leave one!
                   </p>
                 ) : (
                   <ul className="space-y-4">
-                    {reviews.map((item, index) => (
+                    {reviewList.map((item, index) => (
                       <li
                         key={index}
                         className="space-y-2 border-b border-slate-50 dark:border-slate-850 pb-3 last:border-b-0"
                       >
-                        <div className="flex items-center justify-between">
+                        <div className="flex items-center justify-between gap-2">
+                          <div>
+                            <p className="text-[11px] font-bold text-slate-800 dark:text-white">
+                              {item.name || user?.name || "Anonymous"}
+                            </p>
+                            <p className="text-[10px] font-medium text-slate-400">
+                              {item.createdAt ? new Date(item.createdAt).toLocaleDateString() : ""}
+                            </p>
+                          </div>
                           <span className="inline-flex items-center gap-1 text-[10px] font-bold text-white bg-amber-500 rounded-md px-1.5 py-0.5">
                             {item.rating}{" "}
                             <i className="ri-star-s-fill text-[9px]"></i>
                           </span>
                         </div>
                         <p className="text-xs font-semibold text-slate-600 dark:text-slate-350 italic">
-                          "{item.text}"
+                          "{item.text || item.comment || ""}"
                         </p>
                       </li>
                     ))}

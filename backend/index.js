@@ -88,21 +88,30 @@ io.on("connection", (socket) => {
     console.log(`Socket ${socket.id} joined room ${room}`);
   });
 
-  socket.on("send_message", async ({ senderId, senderName, text, room }) => {
-    try {
-      const newMessage = await Message.create({
-        senderId,
-        senderName,
-        text,
-        room,
-      });
+  socket.on(
+    "send_message",
+    async ({ senderId, senderName, senderType, text, room }) => {
+      try {
+        const type =
+          senderType ||
+          (senderId?.startsWith("admin") || senderName === "Admin"
+            ? "admin"
+            : "customer");
+        const newMessage = await Message.create({
+          senderId,
+          senderName,
+          senderType: type,
+          text,
+          room,
+        });
 
-      io.to(room).emit("receive_message", newMessage);
-      io.emit("update_room_list", { room, latestMessage: newMessage });
-    } catch (err) {
-      console.error("Error saving message:", err);
+        io.to(room).emit("receive_message", newMessage);
+        io.emit("update_room_list", { room, latestMessage: newMessage });
+      } catch (err) {
+        console.error("Error saving message:", err);
+      }
     }
-  });
+  );
 
   socket.on("disconnect", () => {
     console.log(`User disconnected: ${socket.id}`);

@@ -1,7 +1,7 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { toast } from "react-toastify";
 
-const API_URL = `${import.meta.env.VITE_API_URL}/api/cart`;
+const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
 const getToken = () => {
   const userInfo = JSON.parse(localStorage.getItem("userInfo"));
@@ -23,7 +23,7 @@ export const fetchCart = createAsyncThunk(
     }
 
     try {
-      const response = await fetch(API_URL, {
+      const response = await fetch(`${BASE_URL}/api/cart`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -47,7 +47,7 @@ export const addToCart = createAsyncThunk(
   "cart/addToCart",
   async (item, { rejectWithValue }) => {
     try {
-      const response = await fetch(API_URL, {
+      const response = await fetch(`${BASE_URL}/api/cart`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -80,7 +80,7 @@ export const updateCartItem = createAsyncThunk(
   "cart/updateCartItem",
   async ({ productId, quantity }, { rejectWithValue }) => {
     try {
-      const response = await fetch(`${API_URL}/${productId}`, {
+      const response = await fetch(`${BASE_URL}/api/cart/${productId}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -109,7 +109,7 @@ export const removeFromCart = createAsyncThunk(
   "cart/removeFromCart",
   async (productId, { rejectWithValue }) => {
     try {
-      const response = await fetch(`${API_URL}/${productId}`, {
+      const response = await fetch(`${BASE_URL}/api/cart/${productId}`, {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${getToken()}`,
@@ -134,7 +134,7 @@ export const clearCart = createAsyncThunk(
   "cart/clearCart",
   async (_, { rejectWithValue }) => {
     try {
-      const response = await fetch(API_URL, {
+      const response = await fetch(`${BASE_URL}/api/cart`, {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${getToken()}`,

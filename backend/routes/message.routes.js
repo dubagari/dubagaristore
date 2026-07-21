@@ -5,6 +5,6 @@ import { protect, adminOnly } from "../middleware/auth.middleware.js";
 const router = express.Router();
 
 router.get("/rooms", protect, adminOnly, getChatRooms);
-router.get("/history/:room", protect, getChatHistory);
+router.get("/history/:room", getChatHistory);
 
 export default router;

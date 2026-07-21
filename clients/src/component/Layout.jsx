@@ -2,6 +2,7 @@ import React from "react";
 import Header from "./Header";
 import Routers from "../router/Routers";
 import Footer from "./Footer";
+import CustomerLiveChat from "../components/chat/CustomerLiveChat";
 
 const Layout = () => {
   return (
@@ -10,6 +11,7 @@ const Layout = () => {
       <main className="flex-grow">
         <Routers />
       </main>
+      <CustomerLiveChat />
       <Footer />
     </div>
   );

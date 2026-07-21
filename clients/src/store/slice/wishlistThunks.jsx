@@ -1,7 +1,10 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { toast } from "react-toastify";
 
-const API_URL = `${import.meta.env.VITE_API_URL}/api/wishlist`;
+
+const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+
+
 
 const getToken = () => {
   const userInfo = JSON.parse(localStorage.getItem("userInfo"));
@@ -19,7 +22,7 @@ export const fetchWishlist = createAsyncThunk(
     }
 
     try {
-      const response = await fetch(API_URL, {
+      const response = await fetch(`${BASE_URL}/api/wishlist`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -43,7 +46,7 @@ export const addToWishlist = createAsyncThunk(
   "wishlist/addToWishlist",
   async (productId, { rejectWithValue }) => {
     try {
-      const response = await fetch(API_URL, {
+      const response = await fetch(`${BASE_URL}/api/wishlist`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -73,7 +76,7 @@ export const removeFromWishlist = createAsyncThunk(
   "wishlist/removeFromWishlist",
   async (productId, { rejectWithValue }) => {
     try {
-      const response = await fetch(`${API_URL}/${productId}`, {
+      const response = await fetch(`${BASE_URL}/api/wishlist/${productId}`, {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${getToken()}`,
@@ -101,7 +104,7 @@ export const clearWishlist = createAsyncThunk(
   "wishlist/clearWishlist",
   async (_, { rejectWithValue }) => {
     try {
-      const response = await fetch(API_URL, {
+      const response = await fetch(`${BASE_URL}/api/wishlist`, {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${getToken()}`,

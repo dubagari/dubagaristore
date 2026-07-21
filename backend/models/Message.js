@@ -18,6 +18,12 @@ const messageSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    senderType: {
+      
+      type: String,
+      enum: ["customer", "admin"],
+      default: "customer",
+    },
   },
   { timestamps: true }
 );

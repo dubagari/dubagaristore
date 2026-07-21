@@ -14,11 +14,12 @@ const Home = () => {
   const [watchData, setWatchData] = useState([]);
   const [latestData, setLatestData] = useState([]);
   const [loading, setLoading] = useState(true);
+  const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
   useEffect(() => {
     const loadProducts = async () => {
       try {
-        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/products`);
+        const res = await fetch(`${BASE_URL}/api/products`);
         const json = await res.json();
         if (json.success && json.data && json.data.length > 0) {
           const dbProducts = json.data.map((p) => ({
@@ -74,7 +75,7 @@ const Home = () => {
   return (
     <div className="bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 min-h-screen transition-colors duration-200">
       {/* Hero Section */}
-      <section className="relative bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 py-20 lg:py-32 overflow-hidden text-white">
+      <section className="relative bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 py-20 lg:py-10 overflow-hidden text-white">
         <div className="absolute inset-0 opacity-20 bg-[radial-gradient(circle_at_bottom_left,_var(--tw-gradient-stops))] from-purple-500 via-slate-900 to-transparent pointer-events-none"></div>
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center relative z-10">

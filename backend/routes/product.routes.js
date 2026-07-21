@@ -26,6 +26,7 @@ import {
   addProduct,
   updateProduct,
   deleteProduct,
+  createProductReview,
 } from "../controllers/product.controller.js";
 import { adminOnly, protect } from "../middleware/auth.middleware.js";
 import { uploadProductImages } from "../controllers/avater.controller.js";
@@ -39,6 +40,7 @@ router.post("/", protect, adminOnly, addProduct);
 router.get("/:id", getProduct);
 router.put("/:id", protect, adminOnly, updateProduct);
 router.delete("/:id", protect, adminOnly, deleteProduct);
+router.post("/:id/reviews", protect, createProductReview);
 
 router.post("/upload-images", upload.array("images", 5), uploadProductImages);
 

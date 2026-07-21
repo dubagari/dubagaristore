@@ -16,9 +16,14 @@ const Login = () => {
 
   const handleLogin = async (e) => {
     e.preventDefault();
+
+     console.log("Login button clicked");
     if (!email || !password) return;
 
+
+
     setLoading(true);
+    console.log("Sending login request...");
     try {
       const res = await fetch("http://localhost:5000/api/auth/login", {
         method: "POST",
@@ -29,6 +34,7 @@ const Login = () => {
       });
 
       const data = await res.json();
+      console.log("LOGIN RESPONSE:", data);
 if (data.success) {
   localStorage.setItem("userInfo", JSON.stringify(data));
   
@@ -38,6 +44,9 @@ if (data.success) {
       user: data.user,
     })
   );
+
+  
+  console.log("Stored user:", localStorage.getItem("user"));
   
   dispatch(fetchCart());
   dispatch(fetchWishlist());

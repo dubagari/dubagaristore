@@ -1,10 +1,12 @@
-import React, { useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { data } from "./Data";
 import { Link, useNavigate } from "react-router-dom";
-import userIcon from "../assets/images/user-icon.png";
 import { useSelector, useDispatch } from "react-redux";
 import { authActions } from "../store/slice/authSlice";
 import { selectWishlistItems } from "../store/slice/wishlistSlice";
+import { Heart, ShoppingCart } from "lucide-react";
+
+
 
 const Header = () => {
   const totalQuantity = useSelector((state) => state.cart.totalQuantity);
@@ -15,6 +17,7 @@ const Header = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const fileInputRef = useRef(null);
+  const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
   const handleFileChange = async (e) => {
     const file = e.target.files[0];
@@ -28,7 +31,7 @@ const Header = () => {
 
         try {
           const res = await fetch(
-            `http://localhost:5000/api/users/upload-avatar/${user._id}`,
+            `${BASE_URL}/api/users/upload-avatar/${user._id}`,
             {
               method: "POST",
               body: formData,
@@ -99,7 +102,7 @@ const Header = () => {
               onClick={() => navigate("/wishlist")}
               className="relative cursor-pointer text-slate-600 hover:text-purple-600 dark:text-slate-350 dark:hover:text-purple-400 transition-colors duration-200"
             >
-              <i className="ri-heart-fill text-2xl"></i>
+              <Heart className="ri-heart-fill text-2xl h-5 w-5" />
               <span className="absolute -top-1.5 -right-1.5 flex h-4.5 w-4.5 items-center justify-center rounded-full bg-purple-600 text-[10px] font-bold text-white animate-pulse">
                 {wishlistItems?.length || 0}
               </span>
@@ -110,7 +113,7 @@ const Header = () => {
               onClick={navigateToCart}
               className="relative cursor-pointer text-slate-600 hover:text-purple-600 dark:text-slate-350 dark:hover:text-purple-400 transition-colors duration-200"
             >
-              <i className="ri-shopping-cart-fill text-2xl"></i>
+              <ShoppingCart className="ri-shopping-cart-fill text-2xl h-5 w-5" />
               <span className="absolute -top-1.5 -right-1.5 flex h-4.5 w-4.5 items-center justify-center rounded-full bg-purple-600 text-[10px] font-bold text-white animate-bounce">
                 {totalQuantity}
               </span>
