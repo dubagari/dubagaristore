@@ -10,6 +10,7 @@ const Orders = () => {
   const [error, setError] = useState(null);
   const navigate = useNavigate();
 
+   const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
   useEffect(() => {
     if (!isAuthenticated) {
       navigate("/login");
@@ -18,7 +19,7 @@ const Orders = () => {
 
     const fetchMyOrders = async () => {
       try {
-        const res = await fetch("http://localhost:5000/api/orders/my-orders", {
+        const res = await fetch(`${BASE_URL}/api/orders/my-orders`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },

@@ -21,6 +21,7 @@ export default function Settings() {
   const [savedSuccess, setSavedSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
   const fileInputRef = useRef(null);
+  const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
   // Form states
 
@@ -36,7 +37,7 @@ export default function Settings() {
 
     try {
       const res = await fetch(
-        `http://localhost:5000/api/users/upload-avatar/${user._id}`,
+        `${API_URL}/api/users/upload-avatar/${user._id}`,
         {
           method: "POST",
           body: formData,

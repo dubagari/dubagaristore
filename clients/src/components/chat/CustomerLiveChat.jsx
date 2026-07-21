@@ -14,6 +14,7 @@ const CustomerLiveChat = () => {
   const [input, setInput] = useState("");
   const [connected, setConnected] = useState(false);
 
+   const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
   const messagesEndRef = useRef(null);
   const { user } = useSelector((state) => state.auth);
 
@@ -49,7 +50,7 @@ const CustomerLiveChat = () => {
     const loadHistory = async () => {
       try {
         const token = localStorage.getItem("token");
-        const res = await fetch(`http://localhost:5000/api/messages/history/${room}`, {
+        const res = await fetch(`${BASE_URL}/api/messages/history/${room}`, {
           headers: token ? { Authorization: `Bearer ${token}` } : {},
         });
         const data = await res.json();

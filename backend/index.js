@@ -29,13 +29,28 @@ await connectDB();
 const app = express();
 
 // middleware
-const allowedOrigins = ["http://localhost:5173", "http://localhost:5174"];
+const allowedOrigins = [
+  "http://localhost:5173", // Client (development)
+  "http://localhost:5174", // Admin (development)
+
+  "https://dubagaristore.vercel.app",        // Client (production)
+  "https://dubagaristore-admin.vercel.app",  // Admin (production)
+];
 
 app.use(
   cors({
-    origin: allowedOrigins,
+    origin(origin, callback) {
+      // Allow tools like Postman or server-to-server requests
+      if (!origin) return callback(null, true);
+
+      if (allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+
+      return callback(new Error("Not allowed by CORS"));
+    },
     credentials: true,
-  }),
+  })
 );
 
 app.use(express.json());
@@ -79,6 +94,7 @@ const io = new Server(server, {
     credentials: true,
   },
 });
+
 
 io.on("connection", (socket) => {
   console.log(`User connected: ${socket.id}`);

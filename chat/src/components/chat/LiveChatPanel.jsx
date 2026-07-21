@@ -2,7 +2,10 @@ import { useEffect, useMemo, useState, useRef } from "react";
 import { MessageCircle, Send, LoaderCircle } from "lucide-react";
 import { io } from "socket.io-client";
 
-const socket = io("http://localhost:5000", {
+
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+
+const socket = io(API_URL, {
   transports: ["websocket"],
   reconnection: true,
 });
@@ -28,7 +31,7 @@ const LiveChatPanel = ({ userName = "Admin", room = "support-room" }) => {
     const fetchHistory = async () => {
       try {
         const token = localStorage.getItem("token");
-        const res = await fetch(`http://localhost:5000/api/messages/history/${room}`, {
+        const res = await fetch(`${API_URL}/api/messages/history/${room}`, {
           headers: token ? { Authorization: `Bearer ${token}` } : {},
         });
         const data = await res.json();

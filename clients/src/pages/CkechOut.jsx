@@ -20,6 +20,7 @@ const CkechOut = () => {
   const [error, setError] = useState(null);
 
   const navigate = useNavigate();
+   const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
   const handlePlaceOrder = async (e) => {
     e.preventDefault();
@@ -55,7 +56,7 @@ const CkechOut = () => {
     }));
 
     try {
-      const res = await fetch("http://localhost:5000/api/orders", {
+      const res = await fetch(`${BASE_URL}/api/orders`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

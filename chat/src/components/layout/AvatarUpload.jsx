@@ -4,6 +4,8 @@ export default function AvatarUpload({ userId, avatar, name, onUpload }) {
   const [loading, setLoading] = useState(false);
   const fileInputRef = useRef(null);
 
+  const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+
   const handleFileChange = async (e) => {
     const file = e.target.files[0];
 
@@ -16,7 +18,7 @@ export default function AvatarUpload({ userId, avatar, name, onUpload }) {
 
     try {
       const res = await fetch(
-        `http://localhost:5000/api/users/upload-avatar/${userId}`,
+        `${API_URL}/api/users/upload-avatar/${userId}`,
         {
           method: "POST",
           body: formData,

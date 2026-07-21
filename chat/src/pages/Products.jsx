@@ -43,7 +43,6 @@ const Product = () => {
   const sortDirection = useSelector(selectSortDirection);
   const stats = useSelector(selectProductsStats);
 
-  console.log(stats);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [uploading, setUploading] = useState(false);
@@ -51,6 +50,8 @@ const Product = () => {
   const loading = useSelector(selectProductsLoading);
   const error = useSelector(selectProductsError);
   const token = localStorage.getItem("token");
+
+  const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
   // New product form state
   const [newProduct, setNewProduct] = useState({
@@ -80,7 +81,7 @@ const Product = () => {
       });
 
       const res = await fetch(
-        "http://localhost:5000/api/products/upload-images",
+        `${API_URL}/api/products/upload-images`,
         {
           method: "POST",
           headers: {
@@ -146,7 +147,7 @@ const Product = () => {
         isNewArrival: newProduct.isNewArrival,
       };
 
-      const res = await fetch("http://localhost:5000/api/products", {
+      const res = await fetch(`${API_URL}/api/products`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

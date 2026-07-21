@@ -10,6 +10,7 @@ const PaystackCheckout = ({ order, email }) => {
   const navigate = useNavigate();
 
   const { token } = useSelector((state) => state.auth);
+   const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
   const config = {
     reference: referenceRef.current,
@@ -25,7 +26,7 @@ const PaystackCheckout = ({ order, email }) => {
     console.log("Payment successful:", paystackRef);
 
     try {
-      const res = await fetch("http://localhost:5000/api/payment/verify", {
+      const res = await fetch(`${BASE_URL}/api/payment/verify`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
