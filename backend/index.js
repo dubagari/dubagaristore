@@ -28,14 +28,7 @@ await connectDB();
 
 const app = express();
 
-// middleware
-// const allowedOrigins = [
-//   "http://localhost:5173", // Client (development)
-//   "http://localhost:5174", // Admin (development)
 
-//   "https://dubagaristore.vercel.app",        // Client (production)
-//   "https://dubagaristore-admin.vercel.app",  // Admin (production)
-// ];
 
 const allowedOrigins = [
   "http://localhost:5173",
