@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { LayoutDashboard, BarChart3, Package, ShoppingCart, Users, Settings, ChevronLeft, ChevronRight, Sparkles } from 'lucide-react';
 import { setActiveTab } from '../../redux/slices/navigationSlice';
+import logo from "../../../public/192.png"  
 
 export default function Sidebar({ isSidebarOpen, setIsSidebarOpen, sidebarCollapsed, setSidebarCollapsed }) {
   const dispatch = useDispatch();
@@ -41,7 +42,7 @@ export default function Sidebar({ isSidebarOpen, setIsSidebarOpen, sidebarCollap
         <div className="flex h-16 items-center justify-between px-6 border-b border-slate-900">
           <div className="flex items-center gap-3">
             <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-purple-600 text-white shadow-lg shadow-purple-650/40 animate-pulse">
-              <Sparkles className="h-5 w-5" />
+              <img src={logo} className="h-5 w-5" alt="logo" />
             </div>
             {!sidebarCollapsed && (
               <span className="capitalize text-lg font-bold text-white tracking-wide bg-gradient-to-r from-white via-purple-100 to-purple-400 bg-clip-text text-transparent">

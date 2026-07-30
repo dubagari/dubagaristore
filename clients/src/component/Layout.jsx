@@ -6,7 +6,7 @@ import CustomerLiveChat from "../components/chat/CustomerLiveChat";
 
 const Layout = () => {
   return (
-    <div className="flex flex-col min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 transition-colors duration-200">
+    <div className="flex min-h-screen flex-col overflow-x-hidden bg-slate-50 text-slate-800 transition-colors duration-200 dark:bg-slate-950 dark:text-slate-100">
       <Header />
       <main className="flex-grow">
         <Routers />

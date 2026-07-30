@@ -131,15 +131,15 @@ const Home = () => {
             <div className="h-1 w-12 bg-purple-600 mx-auto rounded-full"></div>
           </div>
 
-          <div className="grid grid-cols-4 gap-4">
-  {loading ? (
-    <p className="text-sm font-semibold text-slate-400 animate-pulse">
-      Loading products...
-    </p>
-  ) : (
-    <ProductList data={hpData} />
-  )}
-</div>
+          <div className="grid grid-cols-2 gap-4 xl:grid-cols-4">
+            {loading ? (
+              <p className="text-sm font-semibold text-slate-400 animate-pulse">
+                Loading products...
+              </p>
+            ) : (
+              <ProductList data={hpData} />
+            )}
+          </div>
         </div>
       </section>
 
@@ -153,7 +153,7 @@ const Home = () => {
             <div className="h-1 w-12 bg-purple-600 mx-auto rounded-full"></div>
           </div>
 
-          <div className="grid grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 gap-4 xl:grid-cols-4">
             {loading ? (
               <p className="text-sm font-semibold text-slate-400 animate-pulse">Loading products...</p>
             ) : (
@@ -188,7 +188,7 @@ const Home = () => {
             <div className="h-1 w-12 bg-purple-600 mx-auto rounded-full"></div>
           </div>
 
-          <div className="grid grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 gap-4 xl:grid-cols-4">
             {loading ? (
               <p className="text-sm font-semibold text-slate-400 animate-pulse">Loading products...</p>
             ) : (

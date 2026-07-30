@@ -5,6 +5,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { authActions } from "../store/slice/authSlice";
 import { selectWishlistItems } from "../store/slice/wishlistSlice";
 import { Heart, ShoppingCart } from "lucide-react";
+import logo from "../../public/192.png"
 
 
 
@@ -67,18 +68,19 @@ const Header = () => {
   };
 
   return (
-    <header className="sticky top-0 z-50 w-full bg-white/90 dark:bg-slate-950/90 backdrop-blur-md border-b border-slate-100 dark:border-slate-800 transition-colors duration-200">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-20">
+    <header className="sticky top-0 z-50 w-full overflow-x-hidden border-b border-slate-100 bg-white/90 backdrop-blur-md transition-colors duration-200 dark:border-slate-800 dark:bg-slate-950/90">
+      <div className="mx-auto max-w-7xl px-3 sm:px-6 lg:px-8">
+        <div className="flex h-16 items-center justify-between sm:h-20">
           {/* Logo */}
-          <div className="flex-shrink-0">
-            <Link to="/" className="flex items-center gap-1.5">
-              <h2 className="text-2xl font-extrabold tracking-tight text-slate-800 dark:text-white uppercase">
+          <div className="flex-shrink-0 min-w-0">
+            <Link to="/" className="flex min-w-0 items-center gap-1.5">
+              <h2 className="hidden text-2xl font-extrabold uppercase tracking-tight text-slate-800 dark:text-white sm:block">
                 dubagari
                 <span className="bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent">
                   store
                 </span>
               </h2>
+              <img src={logo} className="h-10 w-auto sm:h-12" alt="logo" />
             </Link>
           </div>
 
@@ -96,13 +98,13 @@ const Header = () => {
           </nav>
 
           {/* Header Action Icons */}
-          <div className="flex items-center gap-6">
+          <div className="flex items-center gap-3 sm:gap-6">
             {/* Wishlist */}
             <div 
               onClick={() => navigate("/wishlist")}
-              className="relative cursor-pointer text-slate-600 hover:text-purple-600 dark:text-slate-350 dark:hover:text-purple-400 transition-colors duration-200"
+              className="relative cursor-pointer text-slate-600 transition-colors duration-200 hover:text-purple-600 dark:text-slate-350 dark:hover:text-purple-400"
             >
-              <Heart className="ri-heart-fill text-2xl h-5 w-5" />
+              <Heart className="ri-heart-fill h-5 w-5 text-xl sm:h-5 sm:w-5" />
               <span className="absolute -top-1.5 -right-1.5 flex h-4.5 w-4.5 items-center justify-center rounded-full bg-purple-600 text-[10px] font-bold text-white animate-pulse">
                 {wishlistItems?.length || 0}
               </span>
@@ -111,9 +113,9 @@ const Header = () => {
             {/* Shopping Cart */}
             <div
               onClick={navigateToCart}
-              className="relative cursor-pointer text-slate-600 hover:text-purple-600 dark:text-slate-350 dark:hover:text-purple-400 transition-colors duration-200"
+              className="relative cursor-pointer text-slate-600 transition-colors duration-200 hover:text-purple-600 dark:text-slate-350 dark:hover:text-purple-400"
             >
-              <ShoppingCart className="ri-shopping-cart-fill text-2xl h-5 w-5" />
+              <ShoppingCart className="ri-shopping-cart-fill h-5 w-5 text-xl sm:h-5 sm:w-5" />
               <span className="absolute -top-1.5 -right-1.5 flex h-4.5 w-4.5 items-center justify-center rounded-full bg-purple-600 text-[10px] font-bold text-white animate-bounce">
                 {totalQuantity}
               </span>
@@ -135,7 +137,7 @@ const Header = () => {
                         )}`
                       }
                       alt="User Avatar"
-                      className="h-10 w-10 rounded-full object-cover ring-2 ring-purple-500/20 hover:opacity-80 transition-opacity"
+                      className="h-9 w-9 rounded-full object-cover ring-2 ring-purple-500/20 transition-opacity hover:opacity-80 sm:h-10 sm:w-10"
                     />
                   </button>
 
@@ -184,16 +186,16 @@ const Header = () => {
                   )}
                 </div>
               ) : (
-                <div className="flex gap-2">
+                <div className="flex items-center gap-1.5 sm:gap-2">
                   <Link
                     to="/login"
-                    className="text-xs font-bold text-purple-600 hover:text-purple-700 bg-purple-50 dark:bg-purple-950/40 px-4 py-2 rounded-xl transition-all"
+                    className="rounded-xl bg-purple-50 px-3 py-2 text-[11px] font-bold whitespace-nowrap text-purple-600 transition-all hover:text-purple-700 dark:bg-purple-950/40 sm:px-4 sm:text-xs"
                   >
                     Login
                   </Link>
                   <Link
                     to="/signup"
-                    className="text-xs font-bold text-white bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded-xl shadow-md shadow-purple-650/10 transition-all"
+                    className="hidden rounded-xl bg-purple-600 px-3 py-2 text-[11px] font-bold whitespace-nowrap text-white shadow-md shadow-purple-650/10 transition-all hover:bg-purple-700 sm:inline-flex sm:px-4 sm:text-xs"
                   >
                     Sign Up
                   </Link>

@@ -49,31 +49,31 @@ const BASE_URL = import.meta.env.VITE_API_URL;
   const price = item.price || 0;
 
   return (
-    <div className="flex flex-col justify-between w-full max-w-[280px] bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-3xl p-5 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group">
+    <div className="group flex w-full max-w-[280px] flex-col justify-between rounded-[1.5rem] border border-slate-200 bg-white p-3 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl dark:border-slate-800 dark:bg-slate-900 sm:p-4">
       {/* Product Image */}
-      <div className="w-full h-48 bg-slate-50 dark:bg-slate-950 rounded-2xl overflow-hidden flex items-center justify-center p-4">
+      <div className="flex h-40 items-center justify-center overflow-hidden rounded-[1.25rem] bg-slate-50 p-3 dark:bg-slate-950 sm:h-44">
         <img
           src={imgSrc}
           alt={productName}
-          className="max-h-full max-w-full object-contain group-hover:scale-110 transition-transform duration-500"
+          className="max-h-full max-w-full object-contain transition-transform duration-500 group-hover:scale-110"
         />
       </div>
 
       {/* Info */}
-      <div className="mt-4 space-y-1.5">
-        <span className="inline-block text-[10px] font-extrabold text-purple-600 dark:text-purple-400 uppercase tracking-widest">
+      <div className="mt-3 space-y-1.5">
+        <span className="inline-block text-[10px] font-extrabold uppercase tracking-[0.2em] text-purple-600 dark:text-purple-400">
           {category}
         </span>
 
-        <h3 className="text-sm font-bold text-slate-800 dark:text-white truncate group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors">
+        <h3 className="line-clamp-2 text-sm font-semibold text-slate-800 transition-colors group-hover:text-purple-600 dark:text-white dark:group-hover:text-purple-400">
           {productName}
         </h3>
       </div>
 
       {/* Pricing and CTAs */}
-      <div className="mt-4 flex items-center justify-between pt-3 border-t border-slate-50 dark:border-slate-800">
-        <div>
-          <span className="block text-[10px] font-semibold text-slate-400">
+      <div className="mt-3 flex items-end justify-between border-t border-slate-100 pt-3 dark:border-slate-800">
+        <div className="min-w-0">
+          <span className="block text-[10px] font-semibold uppercase tracking-wide text-slate-400">
             Price
           </span>
           <span className="text-base font-extrabold text-slate-900 dark:text-white">
@@ -81,32 +81,32 @@ const BASE_URL = import.meta.env.VITE_API_URL;
           </span>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex flex-col items-end gap-2">
           <Link
             to={`/shop/${productId}`}
-            className="text-[10px] font-bold text-purple-600 dark:text-purple-400 hover:underline px-2 py-1"
+            className="px-2 py-1 text-[10px] font-semibold text-purple-600 transition-all hover:underline dark:text-purple-400"
           >
             Details
           </Link>
 
           <button
             onClick={toggleWishlist}
-            className={`flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200 dark:border-slate-800 transition-all ${
+            className={`flex h-8 w-8 items-center justify-center rounded-xl border transition-all ${
               isInWishlist
-                ? "bg-red-50 text-red-500 border-red-200 dark:bg-red-900/20 dark:border-red-900/50"
-                : "bg-transparent text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20"
+                ? "border-red-200 bg-red-50 text-red-500 dark:border-red-900/50 dark:bg-red-900/20"
+                : "border-slate-200 bg-white text-slate-400 hover:bg-red-50 hover:text-red-500 dark:border-slate-800 dark:bg-slate-900 dark:hover:bg-red-900/20"
             }`}
             title={isInWishlist ? "Remove from Wishlist" : "Add to Wishlist"}
           >
-            <Heart className={`w-4 h-4 ${isInWishlist ? "fill-current" : ""}`} />
+            <Heart className={`h-4 w-4 ${isInWishlist ? "fill-current" : ""}`} />
           </button>
 
           <button
             onClick={addItem}
-            className="flex h-9 w-9 items-center justify-center rounded-xl bg-purple-600 text-white hover:bg-purple-700 active:scale-95 shadow-md shadow-purple-650/20 hover:shadow-lg transition-all"
+            className="flex h-8 w-8 items-center justify-center rounded-xl bg-purple-600 text-white shadow-sm transition-all hover:bg-purple-700 hover:shadow-md active:scale-95"
             title="Add to Cart"
           >
-            <Plus className="w-5 h-5 text-white" />
+            <Plus className="h-4 w-4 text-white" />
           </button>
         </div>
       </div>
