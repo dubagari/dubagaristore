@@ -49,7 +49,7 @@ const BASE_URL = import.meta.env.VITE_API_URL;
   const price = item.price || 0;
 
   return (
-    <div className="group flex w-full max-w-[280px] flex-col justify-between rounded-[1.5rem] border border-slate-200 bg-white p-3 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl dark:border-slate-800 dark:bg-slate-900 sm:p-4">
+    <div className="group flex w-full flex-col justify-between rounded-[1.5rem] border border-slate-200 bg-white p-3 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl dark:border-slate-800 dark:bg-slate-900 sm:p-4">
       {/* Product Image */}
       <div className="flex h-40 items-center justify-center overflow-hidden rounded-[1.25rem] bg-slate-50 p-3 dark:bg-slate-950 sm:h-44">
         <img
@@ -81,7 +81,7 @@ const BASE_URL = import.meta.env.VITE_API_URL;
           </span>
         </div>
 
-        <div className="flex flex-col items-end gap-2">
+        <div className="flex flex-raw items-end gap-2">
           <Link
             to={`/shop/${productId}`}
             className="px-2 py-1 text-[10px] font-semibold text-purple-600 transition-all hover:underline dark:text-purple-400"

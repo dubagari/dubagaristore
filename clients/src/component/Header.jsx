@@ -6,6 +6,7 @@ import { authActions } from "../store/slice/authSlice";
 import { selectWishlistItems } from "../store/slice/wishlistSlice";
 import { Heart, ShoppingCart } from "lucide-react";
 import logo from "../../public/192.png"
+import { useEffect } from "react";
 
 
 
@@ -19,6 +20,7 @@ const Header = () => {
   const [loading, setLoading] = useState(false);
   const fileInputRef = useRef(null);
   const BASE_URL = import.meta.env.VITE_API_URL
+  const dropdownRef = useRef(null);
 
   const handleFileChange = async (e) => {
     const file = e.target.files[0];
@@ -67,8 +69,44 @@ const Header = () => {
     navigate("/login");
   };
 
+
+
+
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(e.target)
+      ) {
+        setDropdownOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+
+    return () =>
+      document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (dropdownOpen) {
+        setDropdownOpen(false);
+      }
+    };
+
+    if (dropdownOpen) {
+      window.addEventListener("scroll", handleScroll, { passive: true });
+    }
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, [dropdownOpen]);
+
+
   return (
-    <header className="sticky top-0 z-50 w-full overflow-x-hidden border-b border-slate-100 bg-white/90 backdrop-blur-md transition-colors duration-200 dark:border-slate-800 dark:bg-slate-950/90">
+    <header className="sticky top-0 z-50 w-full border-b border-slate-100 bg-white/90 backdrop-blur-md transition-colors duration-200 dark:border-slate-800 dark:bg-slate-950/90">
       <div className="mx-auto max-w-7xl px-3 sm:px-6 lg:px-8">
         <div className="flex h-16 items-center justify-between sm:h-20">
           {/* Logo */}
@@ -122,7 +160,7 @@ const Header = () => {
             </div>
 
             {/* User Dropdown Profile */}
-            <div className="relative">
+            <div className="relative" ref={dropdownRef}>
               {isAuthenticated ? (
                 <div>
                   <button

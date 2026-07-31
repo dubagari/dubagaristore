@@ -1,6 +1,7 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { selectUsers } from "../../redux/slices/userSlice";
+import { useLocation } from "react-router-dom";
 import {
   Sun,
   Moon,
@@ -42,6 +43,36 @@ export default function Navbar({ isSidebarOpen, setIsSidebarOpen }) {
   const [dismissedIds, setDismissedIds] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [showSearchDropdown, setShowSearchDropdown] = useState(false);
+
+
+  
+
+  const location = useLocation();
+
+  useEffect(() => {
+    const closeMenus = () => {
+      setShowProfileMenu(false);
+      setShowSearchDropdown(false);
+      setShowNotifications(false);
+    };
+
+    window.addEventListener("scroll", closeMenus, { passive: true });
+    window.addEventListener("resize", closeMenus);
+
+    return () => {
+      window.removeEventListener("scroll", closeMenus);
+      window.removeEventListener("resize", closeMenus);
+    };
+  }, []);
+
+  useEffect(() => {
+    setShowProfileMenu(false);
+    setShowSearchDropdown(false);
+    setShowNotifications(false);
+  }, [location.pathname]);
+
+
+
 
   // Global Search Results
   const searchResults = useMemo(() => {

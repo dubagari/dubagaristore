@@ -55,7 +55,9 @@ const LiveChatPanel = ({ userName = "Admin", room = "support-room" }) => {
     };
 
     const onReceiveMessage = (message) => {
-      setMessages((prev) => [...prev, message]);
+      if (message.room === room) {
+        setMessages((prev) => [...prev, message]);
+      }
     };
 
     if (socket.connected) {

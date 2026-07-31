@@ -18,8 +18,6 @@ const CustomerLiveChat = () => {
   const messagesEndRef = useRef(null);
   const { user } = useSelector((state) => state.auth);
 
-  const room = "support-room";
-
   const currentUser = useMemo(() => {
     if (user && user._id) {
       return { id: user._id, name: user.name || "Customer" };
@@ -35,6 +33,8 @@ const CustomerLiveChat = () => {
     }
     return { id: guestId, name: "Customer" };
   }, [user]);
+
+  const room = currentUser.id;
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });

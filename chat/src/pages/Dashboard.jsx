@@ -1,4 +1,4 @@
-import { useMemo, useEffect } from "react";
+import { useMemo, useEffect, useState } from "react";
 import { selectAllProducts } from "../redux/slices/productsSlice.js";
 import { useSelector, useDispatch } from "react-redux";
 import { selectAllOrders } from "../redux/slices/ordersSlice.js";
@@ -17,6 +17,7 @@ import Table from "../components/ui/Table";
 import RevenueChart from "../components/charts/RevenueChart";
 import SalesChart from "../components/charts/SalesChart";
 import LiveChatPanel from "../components/chat/LiveChatPanel";
+import { io } from "socket.io-client";
 
 import { setActiveTab } from "../redux/slices/navigationSlice";
 import { fetchOrders } from "../redux/slices/orderThunks.js";
@@ -34,6 +35,39 @@ const Dashboard = () => {
 
   const hour = new Date().getHours();
   const greeting = hour < 12 ? "Good morning" : hour < 17 ? "Good afternoon" : "Good evening";
+
+  const [activeRooms, setActiveRooms] = useState([]);
+  const [selectedRoom, setSelectedRoom] = useState("support-room");
+  const API_URL = import.meta.env.VITE_API_URL;
+
+  useEffect(() => {
+    const fetchRooms = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const res = await fetch(`${API_URL}/api/messages/rooms`, {
+          headers: token ? { Authorization: `Bearer ${token}` } : {},
+        });
+        const data = await res.json();
+        if (data.success) {
+          setActiveRooms(data.data);
+          if (data.data.length > 0 && selectedRoom === "support-room") {
+            setSelectedRoom(data.data[0]._id);
+          }
+        }
+      } catch (error) {
+        console.error("Failed to fetch chat rooms", error);
+      }
+    };
+
+    fetchRooms();
+
+    const socket = io(API_URL, { transports: ["websocket"] });
+    socket.on("update_room_list", () => {
+      fetchRooms();
+    });
+
+    return () => socket.disconnect();
+  }, [API_URL]);
 
   const dashboardStats = useMemo(() => {
     const totalRevenue = allOrders.reduce(
@@ -235,19 +269,33 @@ const Dashboard = () => {
 
       {/* Live chat support */}
       <div className="grid gap-6 xl:grid-cols-[1.2fr_0.8fr]">
-        <LiveChatPanel userName={loggedInUser?.name || "Admin"} />
-        <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900">
-          <h3 className="text-lg font-bold text-slate-800 dark:text-slate-100">Live support status</h3>
-          <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">
-            Customers can now join the support room and exchange messages in real time.
+        <LiveChatPanel userName={loggedInUser?.name || "Admin"} room={selectedRoom} />
+        <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900 flex flex-col h-full max-h-[500px]">
+          <h3 className="text-lg font-bold text-slate-800 dark:text-slate-100">Active Customer Chats</h3>
+          <p className="mt-2 text-sm text-slate-500 dark:text-slate-400 mb-4">
+            Select a customer to join their support room.
           </p>
-          <div className="mt-4 space-y-3">
-            <div className="rounded-xl bg-slate-50 p-3 text-sm text-slate-600 dark:bg-slate-950 dark:text-slate-300">
-              • Room: support-room
-            </div>
-            <div className="rounded-xl bg-slate-50 p-3 text-sm text-slate-600 dark:bg-slate-950 dark:text-slate-300">
-              • Messages are stored in the backend and broadcast instantly
-            </div>
+          <div className="flex-1 overflow-y-auto space-y-2">
+            {activeRooms.length === 0 ? (
+              <div className="text-sm text-slate-400">No active chats found.</div>
+            ) : (
+              activeRooms.map((roomData) => (
+                <div
+                  key={roomData._id}
+                  onClick={() => setSelectedRoom(roomData._id)}
+                  className={`cursor-pointer rounded-xl p-3 text-sm transition-colors ${
+                    selectedRoom === roomData._id
+                      ? "bg-purple-100 dark:bg-purple-900/40 border border-purple-200 dark:border-purple-800 text-purple-800 dark:text-purple-200"
+                      : "bg-slate-50 dark:bg-slate-950 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-900"
+                  }`}
+                >
+                  <div className="font-semibold">{roomData.latestMessage?.senderName || roomData._id}</div>
+                  <div className="text-xs truncate text-slate-500 mt-1">
+                    {roomData.latestMessage?.text}
+                  </div>
+                </div>
+              ))
+            )}
           </div>
         </div>
       </div>
